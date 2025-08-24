@@ -128,7 +128,7 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
----@alias RenderCommandType "button" | "text"
+---@alias RenderCommandType "button" | "text" | "page"
 
 ---@param id unknown
 function M:draggable(id)
@@ -215,6 +215,28 @@ local function button_contains(self, x, y)
 	local ops = M.command_target_positions[self.id]
 	assert(ops ~= nil)
 	return rect_collision(x, y, ops.x, ops.y, w, h)
+end
+
+---@param self RenderCommand
+---@param x integer
+---@param y integer
+local function page_contains(self, x, y)
+  local ops = M.command_target_positions[self.id]
+  assert(ops ~= nil)
+  local pagew, pageh = UI.page.getRealizedDim()
+
+  local cx = ops.x + pagew / 2
+  local cy = ops.y + pageh / 2
+  local dx = x - cx
+  local dy = y - cy
+
+  local angle = ops.r or 0
+  local cos_r = math.cos(-angle)
+  local sin_r = math.sin(-angle)
+
+  local localx = cos_r * dx - sin_r * dy + pagew / 2
+  local localy = sin_r * dx + cos_r * dy + pageh / 2
+  return rect_collision(localx, localy, 0, 0, pagew, pageh)
 end
 
 ---@class RenderableOptions
@@ -319,6 +341,19 @@ function M:text(text, x, y)
 	self:push_renderable("text", text, {}, text_contains, x, y)
 end
 
+---@param page Page
+---@param x integer
+---@param y integer
+---@param r? integer
+---@param ox? integer
+---@param oy? integer
+---@param t? number
+---@param delay? number
+function M:page(page, x, y, r, ox, oy, t, delay)
+  -- Is there a better way to do this, with meta tables?
+  self:push_renderable("page", page, page, page_contains, x, y, r, ox, oy, t, delay)
+end
+
 ---@param x integer
 ---@param y integer
 ---@param f? fun(c: RenderCommand): boolean
@@ -371,6 +406,9 @@ function M:__drawcommand(v)
     assert(text ~= nil)
 		local pos = self.command_target_positions[v.id]
 		UI.text.draw(pos.x, pos.y, text)
+  elseif t == "page" then
+		local pos = self.command_target_positions[v.id]
+		UI.page.draw(v.target, pos.x, pos.y, pos.r)
 	elseif t == "button" then
 		local pos = self.command_target_positions[v.id]
 		UI.button.draw(pos.x, pos.y, v.target)

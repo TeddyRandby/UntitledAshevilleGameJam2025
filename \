@@ -1,0 +1,12 @@
+---@alias SubjectType "player" | "enemy"
+---@alias AdverbType "strong" | "weak" | "precise" | "clumsy" | "fire" | "water" | "nature"
+---@alias VerbType "damage" | "shield"
+
+---@class Page
+---@field subject SubjectType[]
+---@field verb VerbType[]
+---@field adverb AdverbType[]
+
+---@type Page[]
+return {
+}

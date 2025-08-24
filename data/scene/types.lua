@@ -5,7 +5,11 @@
 ---@field type SceneType
 ---@field layout Component[]
 ---@field data? unknown
----
+
+local Components = require("data.scene.components")
+
+local _, NormalizedPageHeight = UI.page.getNormalizedDim()
+
 ---@type Scene[]
 return {
   {
@@ -16,7 +20,8 @@ return {
         View:button(0.5, 0.5, "Play", function()
           print("clicked play")
         end)
-      end
+      end,
+      Components.hand(0.1, -NormalizedPageHeight * 0.5),
     },
   },
 }

@@ -1,4 +1,6 @@
 local Scene = require("data.scene")
+local Page = require("data.page")
+
 ---@class Engine
 ---@field scenes Scene[]
 ---@field scene_buffer Scene[]
@@ -11,11 +13,17 @@ local M = {
   --- A temporary buffer of scenes, queued by components, to be entered
   --- after processing this frame.
   scene_buffer = {},
+
+  --- The list of pages in the players hand
+  player_hand = {},
 }
 
 function M:load()
 	self.rng = love.math.newRandomGenerator(os.clock())
   table.insert(self.scene_stack, Scene.main)
+  for _ = 0, 4 do
+    table.insert(self.player_hand, Page.create(1, 1, 1))
+  end
 end
 
 ---@param dt number
