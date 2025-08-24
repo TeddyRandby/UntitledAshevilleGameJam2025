@@ -25,9 +25,10 @@ local flux = require("util.flux")
 local M = {
 	user_event_handlers = {},
 	last_frame_commands = {},
+	last_frame_deferred = {},
 	command_target_positions = {},
 	commands = {},
-  defer = {},
+  deferred = {},
 }
 
 ---@param o RenderCommandTarget
@@ -154,7 +155,7 @@ end
 
 ---@param id unknown
 function M:bringtotop(id)
-  self.defer[id] = true
+  self.deferred[id] = true
 end
 
 ---@class RenderCommand
@@ -444,7 +445,7 @@ function M:draw()
 	local deferred = {}
 
 	for _, v in ipairs(self.commands) do
-    if self.defer[v.id] then
+    if self.deferred[v.id] then
       table.insert(deferred, v)
     else
       self:__drawcommand(v)
@@ -456,8 +457,9 @@ function M:draw()
 	end
 
 	self.last_frame_commands = self.commands
+  table.append(self.last_frame_commands, deferred)
 	self.commands = {}
-  self.defer = {}
+  self.deferred = {}
 end
 
 return M

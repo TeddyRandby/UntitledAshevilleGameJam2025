@@ -1,22 +1,37 @@
 local Scene = require("data.scene")
 local Page = require("data.page")
+local Word = require("data.word")
 
 ---@class SpellPhrase
----@field type "damage" | "shield" | "status"
----@field value number
+---@field adverbs AdverbType[]
+---@field subject SubjectType
+---@field verb VerbType
 
 ---@class Spell
 ---@field subjects SubjectType[]
 ---@field phrases SpellPhrase[]
----@field element? "fire" | "water" | "nature"
+
+---@class Enemy
+---@field spell Spell
+
+local empty_spell = {
+  adverb_exponent = 1,
+  subjects = {},
+  phrases = {},
+  words = {},
+}
 
 ---@class Engine
 ---@field scenes Scene[]
 ---@field scene_buffer Scene[]
 ---@field rng love.RandomGenerator
 ---@field time integer
+---@field enemy Enemy
+---@field player_spell_state "start" | "adverb" | "verb"
+---@field player_spell_queue WordType[]
 ---@field player_spell Spell
 ---@field player_hand Page[]
+---@field player_dictionary table<string, boolean>
 local M = {
   time = 0,
   --- The actual stack of scenes.
@@ -25,13 +40,21 @@ local M = {
   --- after processing this frame.
   scene_buffer = {},
 
+  enemy = {
+    spell = empty_spell,
+  },
+
   --- The list of pages in the players hand
   player_hand = {},
 
-  player_spell = {
-    subjects = {},
-    phrases = {},
-  },
+  --- The spell being incanted by the player
+  player_spell = empty_spell,
+
+  --- A list of letters the player has learned
+  player_dictionary = {},
+
+  player_spell_queue = {},
+  player_spell_state = "start",
 }
 
 ---@param f fun(phrase: SpellPhrase)
@@ -41,51 +64,54 @@ function M:_modifyphrases(f)
   end
 end
 
+--@param charset string
+function M:learn(charset)
+  for i = 1, #charset do
+    local c = charset:sub(i, i)
+    self.player_dictionary[c] = true
+  end
+end
+
 ---@param word WordType
 function M:play_word(word)
-  if word == "player" or word == "enemy" then
-    table.insert(self.player_spell.subjects, word)
-  elseif word == "strong" then
-    self:_modifyphrases(function(p)
-      print("[ADVERB]", word, p.type, p.value, "=>", p.value * 2)
-      p.value = p.value * 2
-    end)
-  elseif word == "weak" then
-    self:_modifyphrases(function(p)
-      print("[ADVERB]", word, p.type, p.value, "=>", p.value / 2)
-      p.value = p.value / 2
-    end)
-  elseif word == "damage" then
-    ---@type SpellPhrase
-    local phrase = { type = "damage", value = 10 }
+  if self.player_spell_state == "start" then
+    assert(Word.isVerb(word) or Word.isAdverb(word))
 
-    table.insert(self.player_spell.phrases, phrase)
-  elseif word == "shield" then
-    ---@type SpellPhrase
-    local phrase = { type = "shield", value = 10 }
+    table.insert(self.player_spell.phrases, {
+      adverbs = { word },
+    })
 
-    table.insert(self.player_spell.phrases, phrase)
-  elseif word == "fire" then
-    self.player_spell.element = "fire"
+    self.player_spell_state = "adverb"
+  elseif self.player_spell_state == "adverb" then
+    local phrase = table.peek(self.player_spell.phrases)
+    assert(phrase ~= nil)
 
-    ---@type SpellPhrase
-    local phrase = { type = "status", value = 1 }
+    if Word.isSubject(word) then
+      local verb = table.pop(phrase.adverbs)
+      assert(verb ~= nil and Word.isVerb(verb))
 
-    table.insert(self.player_spell.phrases, phrase)
-  elseif word == "water" then
-    self.player_spell.element = "water"
+      ---@diagnostic disable-next-line: assign-type-mismatch
+      phrase.verb = verb
+      ---@diagnostic disable-next-line: assign-type-mismatch
+      phrase.subject = word
+      self.player_spell_state = "start"
+    elseif Word.isAdverb(word) then
+      table.insert(phrase.adverbs, word)
+    elseif Word.isVerb(word) then
+      ---@diagnostic disable-next-line: assign-type-mismatch
+      phrase.verb = word
 
-    ---@type SpellPhrase
-    local phrase = { type = "status", value = 1 }
+      self.player_spell_state = "verb"
+    end
+  elseif self.player_spell_state == "verb" then
+    assert(Word.isSubject(word))
+    local phrase = table.peek(self.player_spell.phrases)
+    assert(phrase ~= nil)
 
-    table.insert(self.player_spell.phrases, phrase)
-  elseif word == "nature" then
-    self.player_spell.element = "nature"
+    ---@diagnostic disable-next-line: assign-type-mismatch
+    phrase.subject = word
 
-    ---@type SpellPhrase
-    local phrase = { type = "status", value = 1 }
-
-    table.insert(self.player_spell.phrases, phrase)
+    self.player_spell_state = "start"
   end
 end
 
@@ -99,22 +125,31 @@ function M:play_page(page)
 end
 
 ---@param phrase SpellPhrase
----@param subjects SubjectType[]
-function M:cast_phrase(phrase, subjects)
-  if phrase.type == "damage" then
-    print("[INCANT]", "damage", phrase.value, "=>", table.unpack(subjects))
-  elseif phrase.type == "shield" then
-    print("[INCANT]", "shield", phrase.value, "=>", table.unpack(subjects))
-  elseif phrase.type == "status" then
-    print("[INCANT]", "status", phrase.value, "=>", table.unpack(subjects))
+function M:cast_phrase(phrase)
+  print(table.concat(phrase.adverbs, "-"), phrase.verb, phrase.subject)
+end
+
+function M:enemy_cast()
+  for _, p in ipairs(self.enemy.spell.phrases) do
+    M:cast_phrase(p)
   end
 end
 
----@param spell Spell
-function M:cast(spell)
-  for _, p in ipairs(spell.phrases) do
-    M:cast_phrase(p, spell.subjects)
+function M:player_cast()
+  if self.player_spell_state ~= "start" then
+    -- Pop the incomplete spell
+    table.pop(self.player_spell.phrases)
   end
+
+  for _, p in ipairs(self.player_spell.phrases) do
+    M:cast_phrase(p)
+  end
+
+  self.player_spell = {
+    adverb_exponent = 1,
+    subjects = {},
+    phrases = {},
+  }
 end
 
 --- Play the ith page in the players hand.
@@ -124,6 +159,27 @@ function M:play(i)
   assert(page ~= nil, "invalid page index")
 
   self:play_page(page)
+end
+
+---@param page Page
+function M:playable_page(page)
+  local word = page.words[1]
+
+  if self.player_spell_state == "start" then
+    return Word.isAdverb(word) or Word.isVerb(word)
+  elseif self.player_spell_state == "adverb" then
+    return true
+  elseif self.player_spell_state == "verb" then
+    return Word.isSubject(word)
+  else
+    assert(false, "Invalid player spell state")
+  end
+end
+
+function M:playable(i)
+  local page = self.player_hand[i]
+  assert(page ~= nil, "invalid page index")
+  return M:playable_page(page)
 end
 
 ---@param scene SceneType
@@ -172,9 +228,13 @@ end
 
 function M:load()
   self.rng = love.math.newRandomGenerator(os.clock())
+
   table.insert(self.scene_stack, Scene.main)
+
+  self:learn("flame")
+
   for _ = 0, 4 do
-    table.insert(self.player_hand, Page.create(1, 1, 1))
+    table.insert(self.player_hand, Page.create_uniform(1))
   end
 end
 

@@ -16,7 +16,7 @@ return {
     type = "main",
     layout = {
       function()
-        View:button(0.5, 0.5, "Play", function()
+        View:button(0.5, 0.5, "play", function()
           Engine:scene_push("combat")
         end)
       end,
@@ -27,13 +27,18 @@ return {
     layout = {
       function()
         View:button(0.5, 0.5, "cast", function()
-          Engine:cast(Engine.player_spell)
+          Engine:player_cast()
         end)
       end,
+      Components.spell_in_progress(0.2, 0.2, function()
+        return Engine.player_spell
+      end),
       Components.hand(0.1, -NormalizedPageHeight * 0.8, function(i, p)
         return {
           dragend = function()
-            Engine:play(i)
+            if Engine:playable(i) then
+              Engine:play(i)
+            end
           end,
         }
       end),
