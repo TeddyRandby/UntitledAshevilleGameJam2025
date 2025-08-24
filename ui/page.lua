@@ -170,7 +170,6 @@ function M.draw(page, x, y, r)
   local _, realh = M.getRealizedDim()
 
   love.graphics.setColor(0, 0, 0)
-  UI.text.draw(10, 1, page.name, 30, "center")
   UI.text.draw(10, h / 4, Page.describe(page), 30)
 
   if xshear and yshear then
@@ -184,7 +183,6 @@ function M.draw(page, x, y, r)
   end
 
   love.graphics.setColor(1, 0, 0)
-  UI.text.draw(10, 1, page.name, 30, "center")
   UI.text.draw(10, h / 4, Page.describe(page), 30)
 end
 

@@ -77,11 +77,20 @@ function M:play_word(word)
   if self.player_spell_state == "start" then
     assert(Word.isVerb(word) or Word.isAdverb(word))
 
-    table.insert(self.player_spell.phrases, {
-      adverbs = { word },
-    })
+    if Word.isAdverb(word) then
+      table.insert(self.player_spell.phrases, {
+        adverbs = { word },
+      })
 
-    self.player_spell_state = "adverb"
+      self.player_spell_state = "adverb"
+    elseif Word.isVerb(word) then
+      table.insert(self.player_spell.phrases, {
+        adverbs = {},
+        verb = word,
+      })
+
+      self.player_spell_state = "verb"
+    end
   elseif self.player_spell_state == "adverb" then
     local phrase = table.peek(self.player_spell.phrases)
     assert(phrase ~= nil)
@@ -112,6 +121,8 @@ function M:play_word(word)
     phrase.subject = word
 
     self.player_spell_state = "start"
+  else
+    assert(false, "Invalid state")
   end
 end
 
@@ -168,7 +179,8 @@ function M:playable_page(page)
   if self.player_spell_state == "start" then
     return Word.isAdverb(word) or Word.isVerb(word)
   elseif self.player_spell_state == "adverb" then
-    return true
+    local prev = table.peek(table.peek(self.player_spell.phrases).adverbs)
+    return prev and Word.isVerb(prev) or not Word.isSubject(word)
   elseif self.player_spell_state == "verb" then
     return Word.isSubject(word)
   else
@@ -231,11 +243,13 @@ function M:load()
 
   table.insert(self.scene_stack, Scene.main)
 
-  self:learn("flame")
+  self:learn("abcdefghijklmnopqrstuvwxyz")
 
-  for _ = 0, 4 do
-    table.insert(self.player_hand, Page.create_uniform(1))
-  end
+  table.insert(self.player_hand, Page.create(1, 0, 0))
+  table.insert(self.player_hand, Page.create(1, 1, 0))
+  table.insert(self.player_hand, Page.create(0, 1, 1))
+  table.insert(self.player_hand, Page.create(0, 1, 1))
+  table.insert(self.player_hand, Page.create(1, 1, 0))
 end
 
 ---@param dt number

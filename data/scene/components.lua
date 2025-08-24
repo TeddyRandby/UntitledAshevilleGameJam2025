@@ -22,7 +22,7 @@ function M.spell_in_progress(x, y, f)
       table.map(spell.phrases, function(p)
         return table.concat(p.adverbs, " ") .. (p.verb or "") .. (p.subject or "")
       end),
-      " "
+      ". "
     )
 
     View:text(phrase, spellx, spelly)

@@ -34,13 +34,87 @@ function M.word(n, dst)
   return table.replacement_sample(Word.UniformWordTypes, n, dst)
 end
 
+---@type table<WordType, string[]>
+local synonyms = {
+  fire = {
+    "fire",
+    "ember",
+    "blaze",
+    "cinder",
+    "ash",
+    "inferno",
+    "burn",
+    "torch",
+    "scorch",
+    "smolder",
+  },
+  water = {
+    "aqua",
+    "drench",
+    "soak",
+    "douse",
+    "splash",
+    "flood",
+    "waterlog",
+    "saturate",
+    "drown",
+    "swamp",
+  },
+  nature = {
+    "sprout",
+    "nature",
+    "plant",
+    "bud",
+    "burgeon",
+    "begetate",
+    "seed",
+    "bloom",
+    "blossom",
+    "flower",
+  },
+  damage = {
+    "ray",
+    "punch",
+    "smash",
+    "crush",
+    "blast",
+    "beam",
+    "burst",
+    "slash",
+    "cleave",
+    "slice",
+  },
+  shield = {
+    "protect",
+    "guard",
+    "keep",
+    "preserve",
+    "ward",
+    "screen",
+    "bulwark",
+    "wall",
+    "palisade",
+    "cover",
+  },
+  player = { "player" },
+  enemy = { "enemy" },
+  strong = { "strong" },
+  weak = { "weak" },
+  very = { "very" },
+}
+
 ---@param n integer
 function M.create_uniform(n)
   local words = M.word(n)
-  print(table.unpack(words))
+  local name = table.concat(
+    table.map(words, function(w)
+      return table.replacement_sample(synonyms[w], 1)[1]
+    end),
+    "\n"
+  )
   ---@type Page
   return {
-    name = "",
+    name = name,
     words = words,
   }
 end
@@ -57,16 +131,23 @@ function M.create(sub, adv, vrb)
   table.append(words, adverbs)
   table.append(words, verbs)
 
+  local name = table.concat(
+    table.map(words, function(w)
+      return table.replacement_sample(synonyms[w], 1)[1]
+    end),
+    "\n"
+  )
+
   ---@type Page
   return {
-    name = "",
+    name = name,
     words = words,
   }
 end
 
 ---@param page Page
 function M.describe(page)
-  return table.concat(page.words, " ")
+  return page.name
 end
 
 ---@param page Page
