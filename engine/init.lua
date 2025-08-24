@@ -18,6 +18,50 @@ local M = {
   player_hand = {},
 }
 
+---@param scene SceneType
+---@param data any
+function M:scene_push(scene, data)
+  local template = Scene[scene]
+  assert(template ~= nil, "Unknown scene: " .. scene)
+  template = table.copy(template)
+  template.data = data
+	table.insert(self.scene_buffer, template)
+end
+
+---@return Scene
+function M:current_scene()
+	local scene = table.peek(self.scene_stack)
+  assert(scene ~= nil, "Missing scene")
+  return scene
+end
+
+--- Rewind to the previous scene.
+function M:scene_rewind()
+	local scene = table.pop(self.scene_stack)
+
+	if scene ~= nil then
+		print("REWIND OVER .. ", scene)
+	end
+
+	if scene ~= "settling" then
+		-- self:__enterscene(self:current_scene())
+	end
+end
+
+---@param scene SceneType
+function M:scene_rewindto(scene)
+	repeat
+		local popped_scene = table.pop(self.scene_stack)
+
+		if popped_scene ~= nil then
+			print("REWINDTO OVER .. ", popped_scene)
+			-- self:__exitscene(popped_scene)
+		end
+	until self:current_scene() == scene
+
+	-- self:__enterscene(self:current_scene())
+end
+
 function M:load()
 	self.rng = love.math.newRandomGenerator(os.clock())
   table.insert(self.scene_stack, Scene.main)
