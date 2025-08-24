@@ -27,6 +27,7 @@ local M = {
 	last_frame_commands = {},
 	command_target_positions = {},
 	commands = {},
+  defer = {},
 }
 
 ---@param o RenderCommandTarget
@@ -149,6 +150,11 @@ end
 function M:receivable(id)
 	local hs = self.user_event_handlers[id]
 	return hs and not not hs["receive"]
+end
+
+---@param id unknown
+function M:bringtotop(id)
+  self.defer[id] = true
 end
 
 ---@class RenderCommand
@@ -438,7 +444,11 @@ function M:draw()
 	local deferred = {}
 
 	for _, v in ipairs(self.commands) do
-		self:__drawcommand(v)
+    if self.defer[v.id] then
+      table.insert(deferred, v)
+    else
+      self:__drawcommand(v)
+    end
 	end
 
 	for _, v in ipairs(deferred) do
@@ -447,6 +457,7 @@ function M:draw()
 
 	self.last_frame_commands = self.commands
 	self.commands = {}
+  self.defer = {}
 end
 
 return M

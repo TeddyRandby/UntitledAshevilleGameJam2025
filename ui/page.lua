@@ -2,14 +2,11 @@ local Shaders = require("util.shaders")
 local Page = require("data.page")
 local M = {}
 
--- love.graphics.setDefaultFilter("nearest", "nearest")
--- local PageSpritesheet = love.graphics.newImage("resources/PageSpritesheet.png")
--- local PageImage = love.graphics.newImage("resources/Page.png")
--- Because the page image isn't a spritesheet, we can do this
--- M.pixelw = PageImage:getPixelWidth()
--- M.pixelh = PageImage:getPixelHeight()
-M.pixelw = 48
-M.pixelh = 64
+love.graphics.setDefaultFilter("nearest", "nearest")
+local PageImage = love.graphics.newImage("resources/Page.png")
+--Because the page image isn't a spritesheet, we can do this
+M.pixelw = PageImage:getPixelWidth()
+M.pixelh = PageImage:getPixelHeight()
 
 function M.getRealizedDim()
 	return UI.realize_xy(M.getNormalizedDim())
@@ -84,27 +81,7 @@ end
 function M.draw(page, x, y, r)
 	local w, h = M.getRealizedDim()
 
-	local cx, cy = w / 2, h / 2
-
-	love.graphics.translate(x + cx, y + cy)
-	love.graphics.rotate(r or 0)
-	love.graphics.translate(-cx, -cy)
-
-  love.graphics.rectangle("line", 0, 0, w, h)
-  local desc = table.concat(page.words, " ")
-
-  UI.text.draw(1, 1, page.name, M.pixelw, "center")
-  UI.text.draw(1, M.pixelh / 2, desc, M.pixelw)
-end
-
----@param page Page
----@param x integer
----@param y integer
----@param r? integer
-function M._draw(page, x, y, r)
-	local w, h = M.getRealizedDim()
-
-	local depth = 4
+	local depth = 2
 	local skew = depth / 100
 	local FontHeight = love.graphics.getFont():getHeight()
 
@@ -151,9 +128,11 @@ function M._draw(page, x, y, r)
 	love.graphics.draw(PageMesh)
 	Shaders.reset()
 
+  local xshear, yshear = nil, nil
+  local ox, oy = love.mouse.getPosition()
+
 	if View:is_hovering(page) then
-		local xshear, yshear = 0, 0
-		local ox, oy = love.mouse.getPosition()
+		xshear, yshear = 0, 0
 
 		local cx = x + w / 2
 		local cy = y + h / 2
@@ -174,7 +153,9 @@ function M._draw(page, x, y, r)
 			xshear = skew * -dx
 			yshear = skew * -dy
 		end
+	end
 
+  if xshear and yshear then
 		love.graphics.translate(ox - x, oy - y)
 
 		-- Apply skew and scale
@@ -182,10 +163,27 @@ function M._draw(page, x, y, r)
 
 		-- Move back so sprite is drawn in correct position
 		love.graphics.translate(-(ox - x), -(oy - y))
-	end
+  end
 
-	love.graphics.printf(page.name, 10 * sx, 1 * sy, (30 * sx / fsy), "center", 0, fsy, fsy, nil, nil)
-	love.graphics.printf(Page.describe(page), 8 * sx, 15 * sy, (34 * sx / fsy), "left", 0, fsy, fsy, nil, nil)
+  local _, realh = M.getRealizedDim()
+
+  love.graphics.setColor(0,0,0)
+  UI.text.draw(10, 1, page.name, 30, "center")
+  UI.text.draw(10, h / 4, Page.describe(page), 30)
+
+  if xshear and yshear then
+		love.graphics.translate(ox - x, oy - y)
+
+		-- Apply skew and scale
+		love.graphics.shear(xshear, yshear)
+
+		-- Move back so sprite is drawn in correct position
+		love.graphics.translate(-(ox - x), -(oy - y))
+  end
+
+  love.graphics.setColor(1,0,0)
+  UI.text.draw(10, 1, page.name, 30, "center")
+  UI.text.draw(10, h / 4, Page.describe(page), 30)
 end
 
 return M

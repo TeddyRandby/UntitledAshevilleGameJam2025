@@ -11,7 +11,7 @@ end
 function M.pixel_width()
 	--- This is where the resolution of the game is defined.
 	--- The screen should be 256 pixels across.
-	--- This is normalized! The width of s pixel on the screen, from 0 - 1.
+	--- This is normalized! The width of a pixel on the screen, from 0 - 1.
 	return (love.graphics.getWidth() / 256) / love.graphics.getWidth()
 end
 

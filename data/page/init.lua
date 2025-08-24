@@ -24,8 +24,8 @@ M.VerbTypes = { "damage", "shield" }
 ---@type WordType[]
 M.WordTypes = {}
 table.append(M.WordTypes, M.SubjectTypes)
-table.append(M.WordTypes, M.AdverbTypes)
 table.append(M.WordTypes, M.VerbTypes)
+table.append(M.WordTypes, M.AdverbTypes)
 
 ---@type WordType[]
 M.UniformWordTypes = {}
@@ -87,6 +87,11 @@ function M.create(sub, adv, vrb)
 		verbs = verbs,
 		words = words,
 	}
+end
+
+---@param page Page
+function M.describe(page)
+  return table.concat(page.words, " ")
 end
 
 return M

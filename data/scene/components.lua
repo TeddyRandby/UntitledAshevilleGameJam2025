@@ -36,7 +36,8 @@ function M.hand(x, y, page_ueh)
 			local thisy = handy + dip
 
 			if View:is_hovering(v) then
-				thisy = thisy - h / 2 - dip
+        View:bringtotop(v)
+				thisy = thisy - h / 4 - dip
 				angle = 0
 			end
 
