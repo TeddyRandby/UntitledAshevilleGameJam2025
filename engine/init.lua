@@ -219,7 +219,8 @@ function M:playable_page(page)
   if self.player_spell_state == "start" then
     return Word.isAdverb(word) or Word.isVerb(word)
   elseif self.player_spell_state == "adverb" then
-    local prev = table.peek(table.peek(self.player_spell.phrases).adverbs)
+    local phrases = table.peek(self.player_spell.phrases).adverbs
+    local prev = phrases and table.peek(phrases)
     return prev and Word.isVerb(prev) or not Word.isSubject(word)
   elseif self.player_spell_state == "verb" then
     return Word.isSubject(word)

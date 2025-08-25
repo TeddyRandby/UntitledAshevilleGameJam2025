@@ -20,18 +20,18 @@ function M.spell_in_progress(x, y, f)
 
 		for _, v in ipairs(spell.phrases) do
 			for _, adv in ipairs(v.adverbs) do
-				View:word(adv, spellx, spelly)
-				spelly = spelly + 40
+				View:spellword(adv, spellx, spelly)
+				spellx = spellx + Font:getWidth(adv.synonym) * (UI.sx() * 0.5)
 			end
 
 			if v.verb then
-				View:word(v.verb, spellx, spelly)
-				spelly = spelly + 40
+				View:spellword(v.verb, spellx, spelly)
+				spellx = spellx + Font:getWidth(v.verb.synonym) * (UI.sx() * 0.5)
 			end
 
 			if v.subject then
-				View:word(v.subject, spellx, spelly)
-				spelly = spelly + 40
+				View:spellword(v.subject, spellx, spelly)
+				spellx = spellx + Font:getWidth(v.subject.synonym) * (UI.sx() * 0.5)
 			end
 		end
 	end
@@ -94,7 +94,7 @@ function M.room()
 		local startY = (screenHeight - map_height * scale) / 2
 		for y = 1, map_height do
 			for x = 1, map_width do
-				View:tile(room.tiles[y][x], x*32, y*32)
+				View:tile(room.tiles[y][x], x * 32, y * 32)
 			end
 		end
 

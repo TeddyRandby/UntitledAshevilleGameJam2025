@@ -3,6 +3,8 @@
 
 ---@class Scene
 ---@field type SceneType
+---@field backdrop_name? string
+---@field backdrop? love.Image
 ---@field layout Component[]
 ---@field data? unknown
 
@@ -29,13 +31,14 @@ return {
   },
   {
     type = "combat",
+    backdrop_name = "BattleScne.png",
     layout = {
       function()
         View:button(0.5, 0.5, "cast", function()
           Engine:player_cast()
         end)
       end,
-      Components.spell_in_progress(0.2, 0.2, function()
+      Components.spell_in_progress(0.01, 0.2, function()
         return Engine.player_spell
       end),
       Components.hand(0.1, -NormalizedPageHeight * 0.8, function(i, p)

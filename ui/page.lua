@@ -9,15 +9,15 @@ M.pixelw = PageImage:getPixelWidth()
 M.pixelh = PageImage:getPixelHeight()
 
 function M.getRealizedDim()
-  return UI.realize_xy(M.getNormalizedDim())
+	return UI.realize_xy(M.getNormalizedDim())
 end
 
 function M.getNormalizedDim()
-  return UI.normalize_xy(M.getPixelDim())
+	return UI.normalize_xy(M.getPixelDim())
 end
 
 function M.getPixelDim()
-  return M.pixelw, M.pixelh
+	return M.pixelw, M.pixelh
 end
 
 -- local PageBG = love.graphics.newQuad(PageImageWidth * 0, 0, PageImageWidth, PageImageHeight, PageSpritesheet)
@@ -29,10 +29,10 @@ end
 -- local PageBD = love.graphics.newQuad(PageImageWidth * 6, 0, PageImageWidth, PageImageHeight, PageSpritesheet)
 
 local meshargs = {
-  { 0,        0,        0, 0 }, -- top-left
-  { M.pixelw, 0,        1, 0 }, -- top-right
-  { M.pixelw, M.pixelh, 1, 1 }, -- bottom-right
-  { 0,        M.pixelh, 0, 1 }, -- bottom-left
+	{ 0, 0, 0, 0 }, -- top-left
+	{ M.pixelw, 0, 1, 0 }, -- top-right
+	{ M.pixelw, M.pixelh, 1, 1 }, -- bottom-right
+	{ 0, M.pixelh, 0, 1 }, -- bottom-left
 }
 
 -- Define 4 mesh vertices in clockwise order: top-left, top-right, bottom-right, bottom-left
@@ -40,38 +40,39 @@ local meshargs = {
 local PageMesh = love.graphics.newMesh(meshargs, "fan", "static")
 local PageMeshHL = love.graphics.newMesh(meshargs, "fan", "static")
 PageMesh:setTexture(PageImage)
+PageMeshHL:setTexture(PageImage)
 
 local function deform_verts(verts, page, x, y, w, h, depth)
-  -- Deform one corner by pushing it inward
-  if View:is_hovering(page) then
-    local ox, oy = love.mouse.getPosition()
+	-- Deform one corner by pushing it inward
+	if View:is_hovering(page) then
+		local ox, oy = love.mouse.getPosition()
 
-    local cx = x + w / 2
-    local cy = y + h / 2
+		local cx = x + w / 2
+		local cy = y + h / 2
 
-    local dx = (ox - cx) / (w / 2)
-    local dy = (oy - cy) / (w / 2)
+		local dx = (ox - cx) / (w / 2)
+		local dy = (oy - cy) / (w / 2)
 
-    local function push(x, y, fx, fy)
-      return x + fx * depth * dx, y + fy * depth * dy
-    end
+		local function push(x, y, fx, fy)
+			return x + fx * depth * dx, y + fy * depth * dy
+		end
 
-    if dx < 0 and dy < 0 then -- top-left
-      verts[1][1], verts[1][2] = push(verts[1][1], verts[1][2], -1, -1)
-      verts[3][1], verts[3][2] = push(verts[3][1], verts[3][2], 1, 1)
-    elseif dx > 0 and dy < 0 then -- top-right
-      verts[2][1], verts[2][2] = push(verts[2][1], verts[2][2], -1, -1)
-      verts[4][1], verts[4][2] = push(verts[4][1], verts[4][2], 1, 1)
-    elseif dx > 0 and dy > 0 then -- bottom-right
-      verts[3][1], verts[3][2] = push(verts[3][1], verts[3][2], -1, -1)
-      verts[1][1], verts[1][2] = push(verts[1][1], verts[1][2], 1, 1)
-    elseif dx < 0 and dy > 0 then -- bottom-left
-      verts[4][1], verts[4][2] = push(verts[4][1], verts[4][2], -1, -1)
-      verts[2][1], verts[2][2] = push(verts[2][1], verts[2][2], 1, 1)
-    end
-  end
+		if dx < 0 and dy < 0 then -- top-left
+			verts[1][1], verts[1][2] = push(verts[1][1], verts[1][2], -1, -1)
+			verts[3][1], verts[3][2] = push(verts[3][1], verts[3][2], 1, 1)
+		elseif dx > 0 and dy < 0 then -- top-right
+			verts[2][1], verts[2][2] = push(verts[2][1], verts[2][2], -1, -1)
+			verts[4][1], verts[4][2] = push(verts[4][1], verts[4][2], 1, 1)
+		elseif dx > 0 and dy > 0 then -- bottom-right
+			verts[3][1], verts[3][2] = push(verts[3][1], verts[3][2], -1, -1)
+			verts[1][1], verts[1][2] = push(verts[1][1], verts[1][2], 1, 1)
+		elseif dx < 0 and dy > 0 then -- bottom-left
+			verts[4][1], verts[4][2] = push(verts[4][1], verts[4][2], -1, -1)
+			verts[2][1], verts[2][2] = push(verts[2][1], verts[2][2], 1, 1)
+		end
+	end
 
-  return verts
+	return verts
 end
 
 ---@param page Page
@@ -79,56 +80,53 @@ end
 ---@param y integer
 ---@param r? integer
 function M.draw(page, x, y, r)
-  local w, h = M.getRealizedDim()
+	local w, h = M.getRealizedDim()
 
-  local depth = 2
-  local skew = depth / 100
-  local FontHeight = love.graphics.getFont():getHeight()
+	local depth = 2
 
-  local sx, sy = UI.scale_xy()
-  local fsy = View.normalize_y(View.getFontSize()) / FontHeight
+	local sx, sy = UI.scale_xy()
 
-  -- Update mesh vertices
-  local verts = {
-    { 0, 0, 0, 0 },
-    { w, 0, 1, 0 },
-    { w, h, 1, 1 },
-    { 0, h, 0, 1 },
-  }
+	-- Update mesh vertices
+	local verts = {
+		{ 0, 0, 0, 0 },
+		{ w, 0, 1, 0 },
+		{ w, h, 1, 1 },
+		{ 0, h, 0, 1 },
+	}
 
-  local cx, cy = w / 2, h / 2
+	local cx, cy = w / 2, h / 2
 
-  love.graphics.translate(x + cx, y + cy)
-  love.graphics.rotate(r or 0)
-  love.graphics.translate(-cx, -cy)
+	love.graphics.translate(x + cx, y + cy)
+	love.graphics.rotate(r or 0)
+	love.graphics.translate(-cx, -cy)
 
-  if View:is_hovering(page) then
-    love.graphics.setColor(1, 1, 1, 1)
-  else
-    love.graphics.setColor(28 / 255, 26 / 255, 48 / 255, 1)
-  end
+	deform_verts(verts, page, x, y, w, h, depth)
 
-  deform_verts(verts, page, x, y, w, h, depth)
+	PageMeshHL:setVertices(verts)
+	PageMesh:setVertices(verts)
 
-  PageMeshHL:setVertices(verts)
-  PageMesh:setVertices(verts)
+	Shaders.pixel_scanline(x, y, w, h, sx, sy, r or 0)
 
-  Shaders.pixel_scanline(x, y, w, h, sx, sy, r or 0)
+	if View:is_hovering(page) then
+		love.graphics.setColor(1, 0, 0)
+	else
+		love.graphics.setColor(0, 0, 0)
+	end
 
-  if Engine:playable_page(page) then
-    love.graphics.draw(
-      PageMeshHL,
-      -UI.realize_x(UI.normalize_x(1)),
-      -UI.realize_y(UI.normalize_y(1)),
-      0,
-      (M.pixelw + 2) / M.pixelw,
-      (M.pixelh + 2) / M.pixelh
-    )
-  end
+	if Engine:playable_page(page) then
+		love.graphics.draw(
+			PageMeshHL,
+			-UI.realize_x(UI.normalize_x(1)),
+			-UI.realize_y(UI.normalize_y(1)),
+			0,
+			(M.pixelw + 2) / M.pixelw,
+			(M.pixelh + 2) / M.pixelh
+		)
+	end
 
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.draw(PageMesh)
-  Shaders.reset()
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.draw(PageMesh)
+	Shaders.reset()
 end
 
 return M
