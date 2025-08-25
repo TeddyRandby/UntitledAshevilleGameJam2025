@@ -45,6 +45,15 @@ function M.depth_counter(x, y, depth)
 	View:text(depth, cx, cy)
 end
 
+local alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+function M.alphabet(x, y)
+	---@type Component
+	return function()
+    View:text(alphabet, 0.2, 0.01)
+  end
+end
+
 ---@param f fun(): number -- A function which returns how relatively healthy this bar should be
 function M.healthbar(x, y, f)
 	---@type Component
