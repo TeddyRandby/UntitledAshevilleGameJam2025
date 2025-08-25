@@ -15,6 +15,8 @@ local flux = require("util.flux")
 ---@field r number
 ---@field scale number
 ---@field tween? unknown
+---@field cx? integer
+---@field cy? integer
 
 ---@class View
 ---@field user_event_handlers table<RenderCommandTarget, UserEventHandler>
@@ -28,7 +30,7 @@ local M = {
 	last_frame_deferred = {},
 	command_target_positions = {},
 	commands = {},
-  deferred = {},
+	deferred = {},
 }
 
 ---@param o RenderCommandTarget
@@ -130,7 +132,7 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
----@alias RenderCommandType "button" | "text" | "page" | "tile"
+---@alias RenderCommandType "button" | "text" | "page" | "word"
 
 ---@param id unknown
 function M:draggable(id)
@@ -155,7 +157,7 @@ end
 
 ---@param id unknown
 function M:bringtotop(id)
-  self.deferred[id] = true
+	self.deferred[id] = true
 end
 
 ---@class RenderCommand
@@ -228,22 +230,22 @@ end
 ---@param x integer
 ---@param y integer
 local function page_contains(self, x, y)
-  local ops = M.command_target_positions[self.id]
-  assert(ops ~= nil)
-  local pagew, pageh = UI.page.getRealizedDim()
+	local ops = M.command_target_positions[self.id]
+	assert(ops ~= nil)
+	local pagew, pageh = UI.page.getRealizedDim()
 
-  local cx = ops.x + pagew / 2
-  local cy = ops.y + pageh / 2
-  local dx = x - cx
-  local dy = y - cy
+	local cx = ops.x + pagew / 2
+	local cy = ops.y + pageh / 2
+	local dx = x - cx
+	local dy = y - cy
 
-  local angle = ops.r or 0
-  local cos_r = math.cos(-angle)
-  local sin_r = math.sin(-angle)
+	local angle = ops.r or 0
+	local cos_r = math.cos(-angle)
+	local sin_r = math.sin(-angle)
 
-  local localx = cos_r * dx - sin_r * dy + pagew / 2
-  local localy = sin_r * dx + cos_r * dy + pageh / 2
-  return rect_collision(localx, localy, 0, 0, pagew, pageh)
+	local localx = cos_r * dx - sin_r * dy + pagew / 2
+	local localy = sin_r * dx + cos_r * dy + pageh / 2
+	return rect_collision(localx, localy, 0, 0, pagew, pageh)
 end
 
 ---@class RenderableOptions
@@ -333,7 +335,7 @@ end
 
 ---@param x integer
 ---@param y integer
----@patam t text
+---@patam t string
 ---@param f function
 ---@param id? unknown
 function M:button(x, y, t, f, id)
@@ -348,6 +350,19 @@ function M:text(text, x, y)
 	self:push_renderable("text", text, {}, text_contains, x, y)
 end
 
+---@param word Word
+---@param x integer
+---@param y integer
+---@param r? integer
+---@param ox? integer
+---@param oy? integer
+---@param t? number
+---@param delay? number
+function M:word(word, x, y, r, ox, oy, t, delay)
+  assert(word ~= nil)
+  self:push_renderable("word", word, word, nil, x, y, r, ox, oy, t, delay)
+end
+
 ---@param page Page
 ---@param x integer
 ---@param y integer
@@ -357,8 +372,19 @@ end
 ---@param t? number
 ---@param delay? number
 function M:page(page, x, y, r, ox, oy, t, delay)
-  -- Is there a better way to do this, with meta tables?
-  self:push_renderable("page", page, page, page_contains, x, y, r, ox, oy, t, delay)
+	-- Is there a better way to do this, with meta tables?
+	self:push_renderable("page", page, page, page_contains, x, y, r, ox, oy, t, delay)
+  local thisx, thisy = x, y
+  local pagew, pageh = UI.page.getRealizedDim()
+	for _, word in ipairs(page.words) do
+    self:word(word, thisx, thisy, r, ox, oy, t, delay)
+    self:bringtotop(word)
+    -- The scuffed nature of this causes the words to look jumpy
+    -- on the page as they move.
+    self.command_target_positions[word].cx = x + pagew / 2
+    self.command_target_positions[word].cy = y + pageh / 2
+    thisy = thisy + 40
+	end
 end
 
 function M:tile(tile, x, y)
@@ -414,7 +440,7 @@ function M:__drawcommand(v)
 	if t == "text" then
 		---@type string
 		local text = v.target
-    assert(text ~= nil)
+		assert(text ~= nil)
 		local pos = self.command_target_positions[v.id]
 		UI.text.draw(pos.x, pos.y, text)
   	elseif t == "page" then
@@ -423,6 +449,14 @@ function M:__drawcommand(v)
   	elseif t == "tile" then
 		local pos = self.command_target_positions[v.id]
 		UI.tile.draw(v.target, pos.x, pos.y)
+	elseif t == "page" then
+		local pos = self.command_target_positions[v.id]
+		UI.page.draw(v.target, pos.x, pos.y, pos.r)
+	elseif t == "word" then
+		---@type Word
+		local word = v.target
+		local pos = self.command_target_positions[v.id]
+		UI.text.draw(pos.x, pos.y, word.synonym, pos.r, nil, nil, pos.cx, pos.cy)
 	elseif t == "button" then
 		local pos = self.command_target_positions[v.id]
 		UI.button.draw(pos.x, pos.y, v.target)
@@ -452,11 +486,11 @@ function M:draw()
 	local deferred = {}
 
 	for _, v in ipairs(self.commands) do
-    if self.deferred[v.id] then
-      table.insert(deferred, v)
-    else
-      self:__drawcommand(v)
-    end
+		if self.deferred[v.id] then
+			table.insert(deferred, v)
+		else
+			self:__drawcommand(v)
+		end
 	end
 
 	for _, v in ipairs(deferred) do
@@ -464,9 +498,9 @@ function M:draw()
 	end
 
 	self.last_frame_commands = self.commands
-  table.append(self.last_frame_commands, deferred)
+	table.append(self.last_frame_commands, deferred)
 	self.commands = {}
-  self.deferred = {}
+	self.deferred = {}
 end
 
 return M
