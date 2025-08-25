@@ -1,3 +1,4 @@
+local Word = require "ui.word"
 local M = {}
 
 local HealthbarSpritesheet = love.graphics.newImage("resources/HealthbarSpritesheet.png")
@@ -51,8 +52,8 @@ function M.alphabet(x, y)
     local thisx, thisy = UI.realize_xy(x, y)
     for i = 1, #Engine.player_alphabet do
       local letter = Engine.player_alphabet:sub(i, i)
-      View:text(letter, thisx, thisy)
-      thisx = thisx + Font:getWidth(letter) * (UI.sx())
+      View:text(letter, thisx, thisy, 0.8)
+      thisx = thisx + Font:getWidth(letter) * (UI.sx() * 0.8)
     end
   end
 end
@@ -89,22 +90,28 @@ function M.spell_in_progress(x, y, f)
     local spellx, spelly = UI.realize_xy(x, y)
 
     local spell = f()
+    local thisy = spelly
 
+    print("LOADING " .. #spell.phrases .. " PHRASES")
     for _, v in ipairs(spell.phrases) do
+      local thisx = spellx
+
       for _, adv in ipairs(v.adverbs) do
-        View:spellword(adv, spellx, spelly)
-        spellx = spellx + Font:getWidth(adv.synonym) * (UI.sx())
+        View:spellword(adv, thisx, thisy)
+        thisx = thisx + Font:getWidth(adv.synonym) * (UI.sx() * Word.spellword_scale())
       end
 
       if v.verb then
-        View:spellword(v.verb, spellx, spelly)
-        spellx = spellx + Font:getWidth(v.verb.synonym) * (UI.sx())
+        View:spellword(v.verb, thisx, thisy)
+        thisx = thisx + Font:getWidth(v.verb.synonym) * (UI.sx() * Word.spellword_scale())
       end
 
       if v.subject then
-        View:spellword(v.subject, spellx, spelly)
-        spellx = spellx + Font:getWidth(v.subject.synonym) * (UI.sx())
+        View:spellword(v.subject, thisx, thisy)
+        thisx = thisx + Font:getWidth(v.subject.synonym) * (UI.sx() * Word.spellword_scale())
       end
+
+      thisy = thisy + UI.sy() * 16 * Word.spellword_scale()
     end
   end
 end
@@ -118,7 +125,9 @@ function M.battle_info(x, y, f)
     local infox, infoy = UI.realize_xy(x, y)
     local damage, shield = f()
 
-    View:text(damage .. "DAMAGE\n" .. shield .. "SHIELD", infox, infoy, 0.5)
+    local txt =damage .. "DAMAGE\n" .. shield .. "SHIELD" 
+    print(txt)
+    View:text(txt, infox, infoy, 0.5)
   end
 end
 

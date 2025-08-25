@@ -1,8 +1,5 @@
 local M = {}
 
-love.graphics.setDefaultFilter("nearest", "nearest")
-local font = love.graphics.newImageFont("resources/Font.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
 function M.pageword_scale()
   return 0.4
 end
@@ -40,10 +37,9 @@ function M.draw(x, y, word, r, limit, align, cx, cy, scale)
 
   love.graphics.push()
 
-  love.graphics.setFont(font)
   love.graphics.setColor(1, 0, 0)
 
-  local w, h = font:getWidth(str), font:getHeight()
+  local w, h = Font:getWidth(str), Font:getHeight()
   w, h = w * sx, h * sy
   cx = cx or (w / 2)
   cy = cy or (h / 2)

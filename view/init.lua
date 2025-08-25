@@ -507,7 +507,7 @@ function M:__drawcommand(v)
 		---@type Word
 		local word = v.target
 		local pos = self.command_target_positions[v.id]
-		UI.word.draw(pos.x, pos.y, word, pos.r, 32 * (UI.sx() * pos.scale), "center", pos.cx, pos.cy, pos.scale)
+		UI.word.draw(pos.x, pos.y, word, pos.r, 32 / pos.scale, "center", pos.cx, pos.cy, pos.scale)
 	elseif t == "spellword" then
 		---@type Word
 		local word = v.target

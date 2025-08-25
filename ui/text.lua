@@ -26,7 +26,7 @@ function M.draw(x, y, text, r, limit, align, cx, cy, scale)
 
 	love.graphics.push()
 
-	love.graphics.setColor(1, 0, 0)
+	love.graphics.setColor(0, 0, 0)
 
 	local w, h = Font:getWidth(str), Font:getHeight()
 	w, h = w * sx, h * sy
