@@ -3,6 +3,14 @@ local M = {}
 love.graphics.setDefaultFilter("nearest", "nearest")
 local font = love.graphics.newImageFont("resources/Font.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
+function M.pageword_scale()
+  return 0.4
+end
+
+function M.spellword_scale()
+  return 0.8
+end
+
 ---@param x integer
 ---@param y integer
 ---@param word Word
@@ -11,7 +19,8 @@ local font = love.graphics.newImageFont("resources/Font.png", " abcdefghijklmnop
 ---@param align? "center" | "justify" | "left" | "right"
 ---@param cx? integer -- An offset around which to rotate
 ---@param cy? integer -- An offset around which to rotate
-function M.draw(x, y, word, r, limit, align, cx, cy)
+---@param scale? number
+function M.draw(x, y, word, r, limit, align, cx, cy, scale)
   local depth = 2
   local skew = depth / 100
 
@@ -27,7 +36,7 @@ function M.draw(x, y, word, r, limit, align, cx, cy)
 
   local sx, sy = UI.scale_xy()
 
-  sx, sy = sx * 0.4, sy * 0.4
+  sx, sy = sx * (scale or 1), sy * (scale or 1)
 
   love.graphics.push()
 
@@ -94,7 +103,7 @@ function M.draw(x, y, word, r, limit, align, cx, cy)
   end
 
   love.graphics.setColor(0, 0, 0)
-  love.graphics.printf(str, 0, 0, sx * (limit or 1000), align or "left", 0, sx, sy)
+  love.graphics.printf(str, 0, 0, limit or 1000, align or "left", 0, sx, sy)
 
   if xshear and yshear then
     love.graphics.translate(ox - x, oy - y)
@@ -107,7 +116,7 @@ function M.draw(x, y, word, r, limit, align, cx, cy)
   end
 
   love.graphics.setColor(1, 0, 0)
-  love.graphics.printf(str, 0, 0, sx * (limit or 1000), align or "left", 0, sx, sy)
+  love.graphics.printf(str, 0, 0, limit or 1000, align or "left", 0, sx, sy)
 
   love.graphics.pop()
   love.graphics.setColor(1, 1, 1)
