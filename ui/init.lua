@@ -103,5 +103,6 @@ M.text = require("ui.text")
 M.page = require("ui.page")
 M.tile = require("ui.tile")
 M.word = require("ui.word")
+M.hand = require("ui.hand")
 
 return M

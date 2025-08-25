@@ -501,6 +501,8 @@ function M:draw()
 		self:__drawcommand(v)
 	end
 
+  UI.hand.draw(not View:is_dragging(), love.mouse.getPosition())
+
 	self.last_frame_commands = self.commands
 	table.append(self.last_frame_commands, deferred)
 	self.commands = {}

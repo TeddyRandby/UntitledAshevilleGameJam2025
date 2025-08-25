@@ -255,6 +255,8 @@ end
 function M:load()
 	self.rng = love.math.newRandomGenerator(os.clock())
 
+  love.mouse.setVisible(false)
+
   table.insert(self.scene_stack, Scene.main)
 
   self.player = Entity.create("player")
