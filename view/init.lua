@@ -132,7 +132,7 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
----@alias RenderCommandType "button" | "text" | "page" | "pageword" | "tile" | "spellword"
+---@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spellword"
 
 ---@param id unknown
 function M:draggable(id)
@@ -414,8 +414,17 @@ function M:page(page, x, y, r, ox, oy, t, delay)
 	end
 end
 
+---@param x integer
+---@param y integer
 function M:tile(tile, x, y)
-	self:push_renderable("tile", tile, {}, nil, x, y)
+  self:sprite(tile.image, x, y)
+end
+
+---@param sprite love.Drawable
+---@param x integer
+---@param y integer
+function M:sprite(sprite, x, y)
+	self:push_renderable("sprite", sprite, {}, nil, x, y)
 end
 
 ---@param x integer
@@ -473,9 +482,9 @@ function M:__drawcommand(v)
 	elseif t == "page" then
 		local pos = self.command_target_positions[v.id]
 		UI.page.draw(v.target, pos.x, pos.y, pos.r)
-	elseif t == "tile" then
+	elseif t == "sprite" then
 		local pos = self.command_target_positions[v.id]
-		UI.tile.draw(v.target, pos.x, pos.y)
+		UI.sprite.draw(v.target, pos.x, pos.y)
 	elseif t == "pageword" then
 		---@type Word
 		local word = v.target

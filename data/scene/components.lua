@@ -1,6 +1,14 @@
 local M = {}
 
-local Word = require("data.word")
+---@param f fun(): number
+function M.healthbar(f)
+  ---@type Component
+  return function()
+
+
+  end
+end
+
 
 local function getSpread(n)
 	local minSpread = math.rad(5)
@@ -19,6 +27,7 @@ function M.spell_in_progress(x, y, f)
 		local spell = f()
 
 		for _, v in ipairs(spell.phrases) do
+      -- TODO: FIgure out why the scaling here is not the same as in UI.text
 			for _, adv in ipairs(v.adverbs) do
 				View:spellword(adv, spellx, spelly)
 				spellx = spellx + Font:getWidth(adv.synonym) * (UI.sx() * 0.5)
