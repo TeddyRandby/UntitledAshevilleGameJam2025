@@ -44,6 +44,7 @@ return {
           Engine:scene_rewind()
         end)
       end,
+      Components.alphabet(0.2, 0.01),
       Components.healthbar(0.01, 0.01, function()
         return Engine.player_health / 3
       end),
@@ -70,6 +71,7 @@ return {
     {
     type = "room",
     layout = {
+      Components.alphabet(0.2, 0.01),
       Components.healthbar(0.01, 0.01, function()
         return Engine.player_health / 3
       end),

@@ -50,7 +50,7 @@ local alphabet = "abcdefghijklmnopqrstuvwxyz"
 function M.alphabet(x, y)
 	---@type Component
 	return function()
-    View:text(alphabet, 0.2, 0.01)
+    View:text(alphabet, x, y)
   end
 end
 
