@@ -33,7 +33,7 @@ local HealthbarEmpty = love.graphics.newQuad(
 	HealthbarSpritesheet
 )
 
-local DepthCounter = love.graphics.newImage("resources/depthCounter.png")
+local DepthCounter = love.graphics.newImage("resources/depthcounter.png")
 
 function M.depth_counter(x, y, depth)
 	View:sprite(DepthCounter, x, y)
