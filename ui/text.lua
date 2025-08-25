@@ -1,7 +1,7 @@
 local M = {}
 
 love.graphics.setDefaultFilter("nearest", "nearest")
-Font = love.graphics.newImageFont("resources/Font.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+Font = love.graphics.newImageFont("resources/Font.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.")
 
 ---@param x integer
 ---@param y integer
