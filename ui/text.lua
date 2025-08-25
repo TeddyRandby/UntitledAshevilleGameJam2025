@@ -29,7 +29,7 @@ function M.draw(x, y, text, r, limit, align, cx, cy)
 	love.graphics.push()
 
 	love.graphics.setFont(font)
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(1, 0, 0)
 
 	local w, h = font:getWidth(str), font:getHeight()
 	w, h = w * sx, h * sy
@@ -37,10 +37,11 @@ function M.draw(x, y, text, r, limit, align, cx, cy)
 	cy = cy or (h / 2)
 	love.graphics.translate(cx, cy)
 	love.graphics.rotate(r or 0)
-	love.graphics.translate(x-cx, y-cy)
+	love.graphics.translate(x - cx, y - cy)
 
 	love.graphics.printf(str, 0, 0, sx * (limit or 1000), align or "left", 0, sx, sy)
 	love.graphics.pop()
+	love.graphics.setColor(1, 1, 1)
 end
 
 return M

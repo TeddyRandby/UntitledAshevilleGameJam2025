@@ -49,13 +49,10 @@ local M = {
 	--- The list of pages in the players hand
 	player_hand = {},
 
-  
   room = {},
   player = {},
   --- The spell being incanted by the player
   player_spell = empty_spell,
-	--- The spell being incanted by the player
-	player_spell = empty_spell,
 
 	--- A list of letters the player has learned
 	player_dictionary = {},
@@ -259,15 +256,12 @@ function M:load()
 	self.rng = love.math.newRandomGenerator(os.clock())
 
   table.insert(self.scene_stack, Scene.main)
-  for _ = 0, 4 do
-    table.insert(self.player_hand, Page.create(1, 1, 1))
-  end
 
-    self.player = Entity.create("player")
+  self.player = Entity.create("player")
   self.room = Room.create("basic", self.player)
 
-
 	self:learn("abcdefghijklmnopqrstuvwxyz")
+	-- self:learn("flame")
 
 	table.insert(self.player_hand, Page.create(1, 0, 0))
 	table.insert(self.player_hand, Page.create(1, 1, 0))

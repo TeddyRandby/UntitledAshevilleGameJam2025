@@ -132,7 +132,7 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
----@alias RenderCommandType "button" | "text" | "page" | "word"
+---@alias RenderCommandType "button" | "text" | "page" | "word" | "tile"
 
 ---@param id unknown
 function M:draggable(id)
@@ -375,6 +375,13 @@ function M:page(page, x, y, r, ox, oy, t, delay)
 	-- Is there a better way to do this, with meta tables?
 	self:push_renderable("page", page, page, page_contains, x, y, r, ox, oy, t, delay)
   local thisx, thisy = x, y
+
+  if View:is_dragging(page) then
+    thisx, thisy = love.mouse.getPosition()
+    thisx = thisx - View.dragging.ox
+    thisy = thisy - View.dragging.oy
+  end
+
   local pagew, pageh = UI.page.getRealizedDim()
 	for _, word in ipairs(page.words) do
     self:word(word, thisx, thisy, r, ox, oy, t, delay)
@@ -449,14 +456,11 @@ function M:__drawcommand(v)
   	elseif t == "tile" then
 		local pos = self.command_target_positions[v.id]
 		UI.tile.draw(v.target, pos.x, pos.y)
-	elseif t == "page" then
-		local pos = self.command_target_positions[v.id]
-		UI.page.draw(v.target, pos.x, pos.y, pos.r)
 	elseif t == "word" then
 		---@type Word
 		local word = v.target
 		local pos = self.command_target_positions[v.id]
-		UI.text.draw(pos.x, pos.y, word.synonym, pos.r, nil, nil, pos.cx, pos.cy)
+		UI.word.draw(pos.x, pos.y, word, pos.r, nil, nil, pos.cx, pos.cy)
 	elseif t == "button" then
 		local pos = self.command_target_positions[v.id]
 		UI.button.draw(pos.x, pos.y, v.target)

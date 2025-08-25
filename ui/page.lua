@@ -129,61 +129,6 @@ function M.draw(page, x, y, r)
   love.graphics.setColor(1, 1, 1)
   love.graphics.draw(PageMesh)
   Shaders.reset()
-
-  -- local xshear, yshear = nil, nil
-  -- local ox, oy = love.mouse.getPosition()
-  --
-  -- if View:is_hovering(page) then
-  --   xshear, yshear = 0, 0
-  --
-  --   local cx = x + w / 2
-  --   local cy = y + h / 2
-  --
-  --   local dx = (ox - cx) / (w / 2)
-  --   local dy = (oy - cy) / (w / 2)
-  --
-  --   if dx < 0 and dy < 0 then
-  --     xshear = skew * dx
-  --     yshear = skew * dy
-  --   elseif dx < 0 and dy > 0 then
-  --     xshear = skew * -dx * dy
-  --     yshear = skew * dy
-  --   elseif dx > 0 and dy < 0 then
-  --     xshear = skew * dx
-  --     yshear = skew * -dy * dx
-  --   else
-  --     xshear = skew * -dx
-  --     yshear = skew * -dy
-  --   end
-  -- end
-  --
-  -- if xshear and yshear then
-  --   love.graphics.translate(ox - x, oy - y)
-  --
-  --   -- Apply skew and scale
-  --   love.graphics.shear(xshear, yshear)
-  --
-  --   -- Move back so sprite is drawn in correct position
-  --   love.graphics.translate(-(ox - x), -(oy - y))
-  -- end
-  --
-  -- local _, realh = M.getRealizedDim()
-  --
-  -- love.graphics.setColor(0, 0, 0)
-  -- UI.text.draw(10, h / 4, Page.describe(page), 30)
-  --
-  -- if xshear and yshear then
-  --   love.graphics.translate(ox - x, oy - y)
-  --
-  --   -- Apply skew and scale
-  --   love.graphics.shear(xshear, yshear)
-  --
-  --   -- Move back so sprite is drawn in correct position
-  --   love.graphics.translate(-(ox - x), -(oy - y))
-  -- end
-  --
-  -- love.graphics.setColor(1, 0, 0)
-  -- UI.text.draw(10, h / 4, Page.describe(page), 30)
 end
 
 return M
