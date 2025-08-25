@@ -133,7 +133,7 @@ function M:__fire(id, e, x, y, data)
 end
 
 
----@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spriteof" | "spellword" | "entity"
+---@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spriteof" | "spellword" | "entity" | "tile"
 
 ---@param id unknown
 function M:draggable(id)
@@ -417,8 +417,8 @@ end
 
 ---@param x integer
 ---@param y integer
-function M:tile(tile, x, y)
-  self:sprite(tile.image, x, y)
+function M:tile(tile, x, y, scale)
+  self:push_renderable("tile", tile, {}, nil, x, y)
 end
 
 ---@param sprite love.Drawable
@@ -517,6 +517,9 @@ function M:__drawcommand(v)
 	elseif t == "entity" then
 		local pos = self.command_target_positions[v.id]
 		UI.entity.draw(v.target, pos.x, pos.y)
+	elseif t == "tile" then
+		local pos = self.command_target_positions[v.id]
+		UI.tile.draw(v.target, pos.x, pos.y)
 	else
 		assert(false, "Unhandled case")
 	end

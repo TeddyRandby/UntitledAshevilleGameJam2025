@@ -33,6 +33,12 @@ local HealthbarEmpty = love.graphics.newQuad(
 	HealthbarSpritesheet
 )
 
+local DepthCounter = love.graphics.newImage("resources/depthCounter.png")
+
+function M.depth_counter(x, y, depth)
+	View:sprite(DepthCounter, x, y)
+end
+
 ---@param f fun(): number -- A function which returns how relatively healthy this bar should be
 function M.healthbar(x, y, f)
 	---@type Component
@@ -158,6 +164,8 @@ function M.room()
 		for _, entity in ipairs(room.entities) do
 			View:entity(entity, startX + (entity.position_x-1)*scale, startY + (entity.position_y-1)*scale)
 		end
+
+		View:sprite(DepthCounter, 10, 10)
 	end
 end
 

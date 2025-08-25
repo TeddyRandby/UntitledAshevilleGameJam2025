@@ -75,7 +75,7 @@ function M.check_collision_tile(entity, dx, dy, room)
     if room.neighbors.left then
       Engine.room = room.neighbors.left
     else
-      local next_room = M.create("basic", entity)
+      local next_room = M.create("basic", entity, room.depth + 1)
       room.neighbors.left = next_room
       next_room.neighbors.right = room
       Engine.room = next_room
@@ -87,7 +87,7 @@ function M.check_collision_tile(entity, dx, dy, room)
     if room.neighbors.up then
       Engine.room = room.neighbors.up
     else
-      local next_room = M.create("basic", entity)
+      local next_room = M.create("basic", entity, room.depth + 1)
       room.neighbors.up = next_room
       next_room.neighbors.down = room
       Engine.room = next_room
@@ -99,7 +99,7 @@ function M.check_collision_tile(entity, dx, dy, room)
     if room.neighbors.right then
       Engine.room = room.neighbors.right
     else
-      local next_room = M.create("basic", entity)
+      local next_room = M.create("basic", entity, room.depth + 1)
       room.neighbors.right = next_room
       next_room.neighbors.left = room
       Engine.room = next_room
@@ -111,7 +111,7 @@ function M.check_collision_tile(entity, dx, dy, room)
     if room.neighbors.down then
       Engine.room = room.neighbors.down
     else
-      local next_room = M.create("basic", entity)
+      local next_room = M.create("basic", entity, room.depth + 1)
       room.neighbors.down = next_room
       next_room.neighbors.up = room
       Engine.room = next_room
@@ -144,13 +144,15 @@ function M.check_collision_entity(entity, dx, dy, room)
   return true
 end
 
-function M.create(type, player)
+function M.create(type, player, depth)
   local room = {
     tiles = new_grid(M[type].layout),
     entities = {player},
-    neighbors = table.copy(M[type].neighbors)
+    neighbors = table.copy(M[type].neighbors),
+    depth = depth or 1
   }
 
+  print(depth)
   if M[type].entities  then
     for _, entity_type in ipairs(M[type].entities) do
       for i = 1, entity_type[1] do

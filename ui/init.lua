@@ -105,5 +105,6 @@ M.sprite = require("ui.sprite")
 M.word = require("ui.word")
 M.hand = require("ui.hand")
 M.entity = require("ui.entity")
+M.tile = require("ui.tile")
 
 return M
