@@ -5,8 +5,11 @@
 
 ---@class Word
 ---@field type WordType
+---@field value? number
+---@field apply? fun(val: number, cs: SpellConsequence[]): number
 ---@field synonym? string
 ---@field synonyms? string[]
+---
 
 ---@type Word[]
 return {
@@ -18,15 +21,40 @@ return {
 	},
 	{
 		type = "very",
+    apply = function(v)
+      return v * 2
+    end,
 	},
 	{
 		type = "strong",
+    value = 1,
+    apply = function(v)
+      return v * 2
+    end,
 	},
 	{
 		type = "weak",
+    value = 1,
+    apply = function(v)
+      return v / 2
+    end,
 	},
 	{
 		type = "fire",
+    value = 10,
+    apply = function(v, cs)
+      ---@type SpellConsequence
+      local c = {
+        -- TODO: Don't hardcode nemey here
+        subject = "enemy",
+        type = "fire",
+        value = 2,
+      }
+
+      table.insert(cs, c)
+
+      return v
+    end,
 		synonyms = {
 			"fire",
 			"ember",
@@ -42,6 +70,20 @@ return {
 	},
 	{
 		type = "water",
+    value = 10,
+    apply = function(v, cs)
+      ---@type SpellConsequence
+      local c = {
+        -- TODO: Don't hardcode subject here
+        subject = "player",
+        type = "water",
+        value = 2,
+      }
+
+      table.insert(cs, c)
+
+      return v
+    end,
 		synonyms = {
 			"aqua",
 			"drench",
@@ -57,6 +99,20 @@ return {
 	},
 	{
 		type = "nature",
+    apply = function(v, cs)
+      ---@type SpellConsequence
+      local c = {
+        -- TODO: Don't hardcode subject here
+        subject = "player",
+        type = "nature",
+        value = 2,
+      }
+
+      table.insert(cs, c)
+
+      return v
+    end,
+    value = 10,
 		synonyms = {
 			"sprout",
 			"nature",
@@ -72,6 +128,7 @@ return {
 	},
 	{
 		type = "damage",
+    value = 10,
 		synonyms = {
 			"ray",
 			"punch",
@@ -87,6 +144,7 @@ return {
 	},
 	{
 		type = "shield",
+    value = 10,
 		synonyms = {
 			"protect",
 			"guard",
