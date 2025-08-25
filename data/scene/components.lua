@@ -187,8 +187,11 @@ function M.room()
 		local map_height = #room.tiles
 
 		local scale = UI.sx()*32
-		local startX = 0
-		local startY = 0
+
+    local totalw = scale * map_width
+    local totalh = scale * map_height
+    local startX = (love.graphics.getWidth() - totalw) / 2
+    local startY = (love.graphics.getHeight() - totalh) / 2
 		for y = 1, map_height do
 			for x = 1, map_width do
 				View:tile(room.tiles[y][x], startX + (x-1)*(scale), startY + (y-1)*(scale))
