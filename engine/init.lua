@@ -62,10 +62,12 @@ local M = {
 
 	--- A list of letters the player has learned
 	player_dictionary = {},
+	player_unlearned = "abcdefghijklmnopqrstuvwxyz ",
 
 	player_spell_state = "start",
 
 	player_health = 3,
+	player_max_health = 3,
 
 	player_damage = 0,
 	player_shield = 0,
@@ -73,11 +75,32 @@ local M = {
 	enemy_shield = 0,
 }
 
+function M:heal(amount)
+	print("Healing", amount)
+	self.player_health = math.min(self.player_health + amount, self.player_max_health)
+end
+
+function M:get_random_letter()
+	if #self.player_unlearned == 0 then
+		return nil
+	end
+	local setLength = #self.player_unlearned
+
+	local randomIndex = math.random(1, setLength)
+
+	local randomLetter = string.sub(self.player_unlearned, randomIndex, randomIndex)
+
+	return randomLetter
+end
+
 --@param charset string
 function M:learn(charset)
 	for i = 1, #charset do
 		local c = charset:sub(i, i)
 		self.player_dictionary[c] = true
+		self.player_unlearned = string.gsub(self.player_unlearned, c, '')
+		print("Learned letter:", c)
+		print("Remaining letters:", self.player_unlearned)
 	end
 end
 
@@ -406,7 +429,7 @@ function M:load()
 	table.insert(self.scene_stack, Scene.main)
 
 	self.player = Entity.create("player")
-	self.room = Room.create("basic", self.player)
+	self.room = Room.create("basic", self.player, 1)
 
 	-- self:learn("abcdefghijklmnopqrstuvwxyz")
 	self:learn("flame")

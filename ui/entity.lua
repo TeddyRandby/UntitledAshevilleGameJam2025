@@ -2,35 +2,32 @@
 local M = {}
 
 local PlayerImage = love.graphics.newImage("resources/ButterEnemy.png")
+local ShrineImage = love.graphics.newImage("resources/Shrine.png")
+
 
 local function translate(tile)
     if tile.type == "player" then
         return PlayerImage 
+    elseif string.find(tile.type, "shrine") then
+        return ShrineImage
     else 
         return PlayerImage
     end 
 end
 
-  function M.draw(tile, x, y)
-    local image = translate(tile)
+  function M.draw(entity, x, y)
+    local image = translate(entity)
 
-	local map_width = 16
-	local map_height = 12
-
-    local pixelw = image:getPixelWidth()
-    local pixelh = image:getPixelHeight()
-	local screenWidth = love.graphics.getWidth()
-	local screenHeight = love.graphics.getHeight()
-	local scale = math.min(screenWidth / map_width , screenHeight / map_height)
+    local scale = UI.sx()
 	love.graphics.draw(
 		image,
 		x,
 		y,
         0,
-        scale/pixelw,
-        scale/pixelh
+        scale,
+        scale
 	)
 
-    love.graphics.rectangle("line", x, y, scale,  scale)
+    love.graphics.rectangle("line", x, y, scale*32*entity.size_x,  scale*32*entity.size_y)
   end
 return M

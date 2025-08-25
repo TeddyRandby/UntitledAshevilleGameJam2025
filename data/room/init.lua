@@ -3,8 +3,9 @@ local M = {}
 local RoomTypes = require("data.room.types")
 local Tiles = require("data.tiles")
 
-local room_width = 16
-local room_height = 12
+local room_width = 8
+local room_height = 6
+local room_keys = {}
 
 local function deep_print(tbl, indent, visited) --TODO Gross, for debug
   indent = indent or 0
@@ -41,6 +42,7 @@ end
 
 for _, v in pairs(RoomTypes) do
 	M[v.type] = v
+  room_keys[#room_keys+1] = v.type
 end
 
 local function new_grid(layout)
@@ -62,6 +64,29 @@ local function sign(n)
   end
 end 
 
+function M.move_through_door(room, going, coming, entity)
+  if room.neighbors[going] then
+    Engine.room = room.neighbors[going]
+  else
+
+    local found  = false
+    local potential_type = nil
+
+    while not found do 
+      potential_type = room_keys[math.random(1, #room_keys)]
+      local potential_room = M[potential_type]
+      if potential_room.connects[coming] then
+        found = true
+      end
+    end
+
+    local next_room = M.create(potential_type, entity, room.depth + 1)
+    room.neighbors[going] = next_room
+    next_room.neighbors[coming] = room
+    Engine.room = next_room
+  end
+end
+
 function M.check_collision_tile(entity, dx, dy, room)
   local new_x  = entity.position_x + dx
   local new_y  = entity.position_y + dy
@@ -71,59 +96,29 @@ function M.check_collision_tile(entity, dx, dy, room)
   local tile = room.tiles[tile_y][tile_x]
 
   if tile.type == "door" and entity.type == "player" then
-  if new_x < 2 then
-    if room.neighbors.left then
-      Engine.room = room.neighbors.left
-    else
-      local next_room = M.create("basic", entity, room.depth + 1)
-      room.neighbors.left = next_room
-      next_room.neighbors.right = room
-      Engine.room = next_room
-    end
-    entity.position_x = room_width - 2
-    entity.position_y = room_height / 2
-
-  elseif new_y < 2 then
-    if room.neighbors.up then
-      Engine.room = room.neighbors.up
-    else
-      local next_room = M.create("basic", entity, room.depth + 1)
-      room.neighbors.up = next_room
-      next_room.neighbors.down = room
-      Engine.room = next_room
-    end
-    entity.position_x = room_width / 2
-    entity.position_y = room_height - 2
-
-  elseif new_x > room_width - 1 then
-    if room.neighbors.right then
-      Engine.room = room.neighbors.right
-    else
-      local next_room = M.create("basic", entity, room.depth + 1)
-      room.neighbors.right = next_room
-      next_room.neighbors.left = room
-      Engine.room = next_room
-    end
-    entity.position_x = 2
-    entity.position_y = room_height / 2
-
-  elseif new_y > room_height - 1 then
-    if room.neighbors.down then
-      Engine.room = room.neighbors.down
-    else
-      local next_room = M.create("basic", entity, room.depth + 1)
-      room.neighbors.down = next_room
-      next_room.neighbors.up = room
-      Engine.room = next_room
-    end
-    entity.position_x = room_width / 2
-    entity.position_y = 2
+      if new_x < 2 then
+        M.move_through_door(room, "left", "right", entity)
+        entity.position_x = room_width - 2
+        entity.position_y = room_height / 2
+      elseif new_y < 2 then
+        M.move_through_door(room, "up", "down", entity)
+        entity.position_x = room_width / 2
+        entity.position_y = room_height - 2
+      elseif new_x > room_width - 1 then
+        M.move_through_door(room, "right", "left", entity)
+        entity.position_x = 2
+        entity.position_y = room_height / 2
+      elseif new_y > room_height - 1 then
+        M.move_through_door(room, "down", "up", entity)
+        entity.position_x = room_width / 2
+        entity.position_y = 2
+      end
   end
 
-
-  end
   return tile.walkable
 end
+
+local epsilon = 0.1
 
 function M.check_collision_entity(entity, dx, dy, room)
   local new_x  = entity.position_x + dx
@@ -131,9 +126,9 @@ function M.check_collision_entity(entity, dx, dy, room)
 
   for _, other in ipairs(room.entities) do
     if other ~= entity then
-      if math.abs(new_x - other.position_x) < 1 and math.abs(new_y - other.position_y) < 1 then
+      if math.abs(new_x - other.position_x) < 1 - epsilon and math.abs(new_y - other.position_y) < 1 - epsilon then
         if other.collision then
-          other.collision()
+          other.collision(other)
         end
         if not other.walkable then
           return false
@@ -145,20 +140,36 @@ function M.check_collision_entity(entity, dx, dy, room)
 end
 
 function M.create(type, player, depth)
+
+  local connects = {}
+
+  for k, v in pairs(M[type].connects) do
+    connects[k] = v
+  end
+
   local room = {
     tiles = new_grid(M[type].layout),
     entities = {player},
-    neighbors = table.copy(M[type].neighbors),
+    neighbors = {},
+    connects = connects,
     depth = depth or 1
   }
 
-  print(depth)
   if M[type].entities  then
     for _, entity_type in ipairs(M[type].entities) do
       for i = 1, entity_type[1] do
         local entity = require("data.entity").create(entity_type[2])
-        entity.position_x = math.random(2, room_width - 1)
-        entity.position_y = math.random(2, room_height - 1)
+
+        local placed = false
+        while not placed do
+          entity.position_x = math.random(2, room_width - 1)
+          entity.position_y = math.random(2, room_height - 1)
+
+          local tile = room.tiles[math.floor(entity.position_y)][math.floor(entity.position_x)]
+          if tile.walkable then
+            placed = true
+          end
+        end
         table.insert(room.entities, entity)
       end
     end
