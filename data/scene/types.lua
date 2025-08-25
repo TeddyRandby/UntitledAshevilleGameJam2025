@@ -36,16 +36,27 @@ return {
       function()
         View:button(0.5, 0.5, "cast", function()
           Engine:player_cast()
+          -- Engine:scene_rewind()
+        end)
+      end,
+      function()
+        View:button(-0.1, -0.1, "back", function()
           Engine:scene_rewind()
         end)
       end,
       Components.healthbar(0.01, 0.01, function()
         return Engine.player_health / 3
       end),
+      Components.battle_info(0.01, -0.1, function()
+        return Engine.player_damage, Engine.player_shield
+      end),
+      Components.battle_info(0.01, -0.2, function()
+        return Engine.enemy_damage, Engine.enemy_shield
+      end),
       Components.spell_in_progress(0.01, 0.2, function()
         return Engine.player_spell
       end),
-      Components.hand(0.1, -NormalizedPageHeight * 0.8, function(i, p)
+      Components.hand(0.3, -NormalizedPageHeight * 0.8, function(i, p)
         return {
           dragend = function()
             if Engine:playable(i) then
