@@ -15,6 +15,8 @@ local flux = require("util.flux")
 ---@field r number
 ---@field scale number
 ---@field tween? unknown
+---@field cx? integer
+---@field cy? integer
 
 ---@class View
 ---@field user_event_handlers table<RenderCommandTarget, UserEventHandler>
@@ -28,7 +30,7 @@ local M = {
 	last_frame_deferred = {},
 	command_target_positions = {},
 	commands = {},
-  deferred = {},
+	deferred = {},
 }
 
 ---@param o RenderCommandTarget
@@ -130,7 +132,8 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
----@alias RenderCommandType "button" | "text" | "page" | "tile" | "entity"
+
+---@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spriteof" | "spellword" | "entity"
 
 ---@param id unknown
 function M:draggable(id)
@@ -155,7 +158,7 @@ end
 
 ---@param id unknown
 function M:bringtotop(id)
-  self.deferred[id] = true
+	self.deferred[id] = true
 end
 
 ---@class RenderCommand
@@ -228,22 +231,22 @@ end
 ---@param x integer
 ---@param y integer
 local function page_contains(self, x, y)
-  local ops = M.command_target_positions[self.id]
-  assert(ops ~= nil)
-  local pagew, pageh = UI.page.getRealizedDim()
+	local ops = M.command_target_positions[self.id]
+	assert(ops ~= nil)
+	local pagew, pageh = UI.page.getRealizedDim()
 
-  local cx = ops.x + pagew / 2
-  local cy = ops.y + pageh / 2
-  local dx = x - cx
-  local dy = y - cy
+	local cx = ops.x + pagew / 2
+	local cy = ops.y + pageh / 2
+	local dx = x - cx
+	local dy = y - cy
 
-  local angle = ops.r or 0
-  local cos_r = math.cos(-angle)
-  local sin_r = math.sin(-angle)
+	local angle = ops.r or 0
+	local cos_r = math.cos(-angle)
+	local sin_r = math.sin(-angle)
 
-  local localx = cos_r * dx - sin_r * dy + pagew / 2
-  local localy = sin_r * dx + cos_r * dy + pageh / 2
-  return rect_collision(localx, localy, 0, 0, pagew, pageh)
+	local localx = cos_r * dx - sin_r * dy + pagew / 2
+	local localy = sin_r * dx + cos_r * dy + pageh / 2
+	return rect_collision(localx, localy, 0, 0, pagew, pageh)
 end
 
 ---@class RenderableOptions
@@ -333,7 +336,7 @@ end
 
 ---@param x integer
 ---@param y integer
----@patam t text
+---@patam t string
 ---@param f function
 ---@param id? unknown
 function M:button(x, y, t, f, id)
@@ -348,6 +351,32 @@ function M:text(text, x, y)
 	self:push_renderable("text", text, {}, text_contains, x, y)
 end
 
+---@param word Word
+---@param x integer
+---@param y integer
+---@param r? integer
+---@param ox? integer
+---@param oy? integer
+---@param t? number
+---@param delay? number
+function M:pageword(word, x, y, r, ox, oy, t, delay)
+	assert(word ~= nil)
+	self:push_renderable("pageword", word, word, nil, x, y, r, ox, oy, t, delay)
+end
+
+---@param word Word
+---@param x integer
+---@param y integer
+---@param r? integer
+---@param ox? integer
+---@param oy? integer
+---@param t? number
+---@param delay? number
+function M:spellword(word, x, y, r, ox, oy, t, delay)
+	assert(word ~= nil)
+	self:push_renderable("spellword", word, word, nil, x, y, r, ox, oy, t, delay)
+end
+
 ---@param page Page
 ---@param x integer
 ---@param y integer
@@ -357,12 +386,54 @@ end
 ---@param t? number
 ---@param delay? number
 function M:page(page, x, y, r, ox, oy, t, delay)
-  -- Is there a better way to do this, with meta tables?
-  self:push_renderable("page", page, page, page_contains, x, y, r, ox, oy, t, delay)
+	-- Is there a better way to do this, with meta tables?
+	self:push_renderable("page", page, page, page_contains, x, y, r, ox, oy, t, delay)
+	local thisx, thisy = x, y
+
+	if View:is_dragging(page) then
+		thisx, thisy = love.mouse.getPosition()
+		thisx = thisx - View.dragging.ox
+		thisy = thisy - View.dragging.oy
+	end
+
+	local pagew, pageh = UI.page.getRealizedDim()
+
+	thisx = thisx + UI.realize_x(UI.width(2))
+	thisy = thisy + (pageh * 0.4)
+
+	for _, word in ipairs(page.words) do
+		-- Make the words twice as fast as the page at tweening.
+		self:pageword(word, thisx, thisy, r, ox, oy, t and t / 2, delay)
+		if View:is_hovering(page) then
+			self:bringtotop(word)
+		end
+		-- The scuffed nature of this causes the words to look jumpy
+		-- on the page as they move.
+		self.command_target_positions[word].cx = x + pagew / 2
+		self.command_target_positions[word].cy = y + pageh / 2
+		thisy = thisy + 8 * UI.sy()
+	end
 end
 
+---@param x integer
+---@param y integer
 function M:tile(tile, x, y)
-	self:push_renderable("tile", tile, {}, nil, x, y)
+  self:sprite(tile.image, x, y)
+end
+
+---@param sprite love.Drawable
+---@param x integer
+---@param y integer
+function M:sprite(sprite, x, y)
+	self:push_renderable("sprite", sprite, {}, nil, x, y)
+end
+
+---@param sprite love.Quad
+---@param spritesheet love.Drawable
+---@param x integer
+---@param y integer
+function M:spriteOf(sprite, spritesheet, x, y)
+	self:push_renderable("spriteof", { sprite, spritesheet }, {}, nil, x, y)
 end
 
 function M:entity(entity, x, y)
@@ -418,15 +489,28 @@ function M:__drawcommand(v)
 	if t == "text" then
 		---@type string
 		local text = v.target
-    assert(text ~= nil)
+		assert(text ~= nil)
 		local pos = self.command_target_positions[v.id]
 		UI.text.draw(pos.x, pos.y, text)
-  	elseif t == "page" then
+	elseif t == "page" then
 		local pos = self.command_target_positions[v.id]
 		UI.page.draw(v.target, pos.x, pos.y, pos.r)
-  	elseif t == "tile" then
+	elseif t == "sprite" then
 		local pos = self.command_target_positions[v.id]
-		UI.tile.draw(v.target, pos.x, pos.y)
+		UI.sprite.draw(v.target, pos.x, pos.y)
+	elseif t == "spriteof" then
+		local pos = self.command_target_positions[v.id]
+		UI.sprite.drawof(v.target[1], v.target[2], pos.x, pos.y)
+	elseif t == "pageword" then
+		---@type Word
+		local word = v.target
+		local pos = self.command_target_positions[v.id]
+		UI.word.draw(pos.x, pos.y, word, pos.r, UI.realize_x(28), "center", pos.cx, pos.cy)
+	elseif t == "spellword" then
+		---@type Word
+		local word = v.target
+		local pos = self.command_target_positions[v.id]
+		UI.word.draw(pos.x, pos.y, word, pos.r, nil, nil)
 	elseif t == "button" then
 		local pos = self.command_target_positions[v.id]
 		UI.button.draw(pos.x, pos.y, v.target)
@@ -442,6 +526,13 @@ end
 
 -- TODO: Updating dragging positions *here* causes some real confusing behavior.
 function M:draw()
+	local scene = Engine:current_scene()
+	if scene.backdrop then
+		local sx, sy = UI.scale_xy()
+
+		love.graphics.draw(scene.backdrop, 0, 0, 0, sx, sy)
+	end
+
 	-- Update position of dragged elements to match mouse
 	if View:is_dragging() then
 		assert(View.dragging ~= nil)
@@ -459,21 +550,25 @@ function M:draw()
 	local deferred = {}
 
 	for _, v in ipairs(self.commands) do
-    if self.deferred[v.id] then
-      table.insert(deferred, v)
-    else
-      self:__drawcommand(v)
-    end
+		if self.deferred[v.id] then
+			table.insert(deferred, v)
+		else
+			self:__drawcommand(v)
+		end
 	end
 
 	for _, v in ipairs(deferred) do
 		self:__drawcommand(v)
 	end
 
+	if Engine:current_scene() ~= "room" then
+		UI.hand.draw(not View:is_dragging(), love.mouse.getPosition())
+	end
+
 	self.last_frame_commands = self.commands
-  table.append(self.last_frame_commands, deferred)
+	table.append(self.last_frame_commands, deferred)
 	self.commands = {}
-  self.deferred = {}
+	self.deferred = {}
 end
 
 return M

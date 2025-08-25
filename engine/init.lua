@@ -4,21 +4,23 @@ local Room = require("data.room")
 local Entity = require("data.entity")
 local Word = require("data.word")
 
----@class SpellPhrase
----@field adverbs AdverbType[]
+---@class SpellConsequence
+---@field type VerbType
+---@field value number
 ---@field subject SubjectType
----@field verb VerbType
+
+---@class SpellPhrase
+---@field adverbs Word[]
+---@field subject Word
+---@field verb Word
 
 ---@class Spell
----@field subjects SubjectType[]
 ---@field phrases SpellPhrase[]
 
 ---@class Enemy
 ---@field spell Spell
 
 local empty_spell = {
-  adverb_exponent = 1,
-  subjects = {},
   phrases = {},
   words = {},
 }
@@ -29,8 +31,8 @@ local empty_spell = {
 ---@field rng love.RandomGenerator
 ---@field time integer
 ---@field enemy Enemy
+---@field player_health number
 ---@field player_spell_state "start" | "adverb" | "verb"
----@field player_spell_queue WordType[]
 ---@field player_spell Spell
 ---@field player_hand Page[]
 ---@field player_dictionary table<string, boolean>
@@ -49,7 +51,6 @@ local M = {
   --- The list of pages in the players hand
   player_hand = {},
 
-  
   room = {},
   player = {},
   --- The spell being incanted by the player
@@ -58,16 +59,10 @@ local M = {
   --- A list of letters the player has learned
   player_dictionary = {},
 
-  player_spell_queue = {},
   player_spell_state = "start",
-}
 
----@param f fun(phrase: SpellPhrase)
-function M:_modifyphrases(f)
-  for _, p in ipairs(self.player_spell.phrases) do
-    f(p)
-  end
-end
+  player_health = 3,
+}
 
 --@param charset string
 function M:learn(charset)
@@ -77,7 +72,7 @@ function M:learn(charset)
   end
 end
 
----@param word WordType
+---@param word Word
 function M:play_word(word)
   if self.player_spell_state == "start" then
     assert(Word.isVerb(word) or Word.isAdverb(word))
@@ -104,15 +99,12 @@ function M:play_word(word)
       local verb = table.pop(phrase.adverbs)
       assert(verb ~= nil and Word.isVerb(verb))
 
-      ---@diagnostic disable-next-line: assign-type-mismatch
       phrase.verb = verb
-      ---@diagnostic disable-next-line: assign-type-mismatch
       phrase.subject = word
       self.player_spell_state = "start"
     elseif Word.isAdverb(word) then
       table.insert(phrase.adverbs, word)
     elseif Word.isVerb(word) then
-      ---@diagnostic disable-next-line: assign-type-mismatch
       phrase.verb = word
 
       self.player_spell_state = "verb"
@@ -122,7 +114,6 @@ function M:play_word(word)
     local phrase = table.peek(self.player_spell.phrases)
     assert(phrase ~= nil)
 
-    ---@diagnostic disable-next-line: assign-type-mismatch
     phrase.subject = word
 
     self.player_spell_state = "start"
@@ -142,7 +133,58 @@ end
 
 ---@param phrase SpellPhrase
 function M:cast_phrase(phrase)
-  print(table.concat(phrase.adverbs, "-"), phrase.verb, phrase.subject)
+  local type = phrase.verb.type
+  local value = phrase.verb.value
+  assert(value ~= nil, "Missing value for verb: " .. phrase.verb.type)
+
+  ---@type SpellConsequence[]
+  local consequences = {}
+  -- Shift adverbs off smartly to handle very properly.
+  -- Keep a list of effects/outcomes, so that, status can be added.
+  while not table.isempty(phrase.adverbs) do
+    local v = table.shift(phrase.adverbs)
+    assert(v ~= nil, "Impossible")
+    assert(v.apply ~= nil, "Missing apply for adverb: " .. v.type)
+
+    if v.type == "very" then
+      local adverb = table[1]
+      if adverb then
+        value = v.apply(value, consequences)
+      end
+    else
+      value = v.apply(value, consequences)
+    end
+  end
+
+  table.insert(consequences, {
+    subject = phrase.subject.type,
+    type = type,
+    value = value,
+  })
+
+  for _, v in ipairs(consequences) do
+    local consequence_type = v.type
+    local consequence_target = v.subject
+    print(consequence_type, consequence_target, v.value)
+
+    if consequence_type == "damage" then
+      -- TODO: DO DAMAGE TO TARGET
+    elseif consequence_type == "shield" then
+      -- TODO: SHIELD TARGET
+    elseif consequence_type == "strong" then
+      -- TODO: APPLY STATUS EFFECTS
+    elseif consequence_type == "weak" then
+      -- TODO: APPLY STATUS EFFECTS
+    elseif consequence_type == "fire" then
+      -- TODO: APPLY STATUS EFFECTS
+    elseif consequence_type == "water" then
+      -- TODO: APPLY STATUS EFFECTS
+    elseif consequence_type == "nature" then
+      -- TODO: APPLY STATUS EFFECTS
+    else
+      assert(false, "Unhandled phrase verb: " .. phrase.verb.type)
+    end
+  end
 end
 
 function M:enemy_cast()
@@ -161,11 +203,7 @@ function M:player_cast()
     M:cast_phrase(p)
   end
 
-  self.player_spell = {
-    adverb_exponent = 1,
-    subjects = {},
-    phrases = {},
-  }
+  self.player_spell = { phrases = {} }
 end
 
 --- Play the ith page in the players hand.
@@ -184,7 +222,8 @@ function M:playable_page(page)
   if self.player_spell_state == "start" then
     return Word.isAdverb(word) or Word.isVerb(word)
   elseif self.player_spell_state == "adverb" then
-    local prev = table.peek(table.peek(self.player_spell.phrases).adverbs)
+    local phrases = table.peek(self.player_spell.phrases).adverbs
+    local prev = phrases and table.peek(phrases)
     return prev and Word.isVerb(prev) or not Word.isSubject(word)
   elseif self.player_spell_state == "verb" then
     return Word.isSubject(word)
@@ -273,20 +312,18 @@ function M:update_dungeon(dt)
   end
 end
 
-
 function M:load()
   self.rng = love.math.newRandomGenerator(os.clock())
 
+  love.mouse.setVisible(false)
+
   table.insert(self.scene_stack, Scene.main)
-  for _ = 0, 4 do
-    table.insert(self.player_hand, Page.create(1, 1, 1))
-  end
 
   self.player = Entity.create("player")
   self.room = Room.create("basic", self.player)
 
-
-  self:learn("abcdefghijklmnopqrstuvwxyz")
+  -- self:learn("abcdefghijklmnopqrstuvwxyz")
+  self:learn("flame")
 
   table.insert(self.player_hand, Page.create(1, 0, 0))
   table.insert(self.player_hand, Page.create(1, 1, 0))
