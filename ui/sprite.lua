@@ -4,7 +4,8 @@ local M = {}
 ---@param x integer
 ---@param y integer
 function M.draw(image, x, y)
-	love.graphics.draw(image, x, y)
+  local sx, sy = UI.scale_xy()
+	love.graphics.draw(image, x, y, 0, sx, sy)
 end
 
 ---@param sprite love.Quad

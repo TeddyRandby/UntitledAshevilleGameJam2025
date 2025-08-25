@@ -38,12 +38,15 @@ local DepthCounter = love.graphics.newImage("resources/DepthCounter.png")
 local DepthCounterPixelW = 64
 local DepthCounterPixelH = 64
 
-function M.depth_counter(x, y, depth)
-  depth = tostring(depth)
-  View:sprite(DepthCounter, x, y)
-  local cx = x + DepthCounterPixelW / 2 - love.graphics.getFont():getWidth(depth) / 2
-  local cy = y + DepthCounterPixelH / 2 - love.graphics.getFont():getHeight() / 2
-  View:text(depth, cx, cy)
+function M.depth_counter(x, y)
+  return function()
+    local depth = Engine.room.depth
+    depth = tostring(depth)
+    View:sprite(DepthCounter, x, y)
+    local cx = x + DepthCounterPixelW / 2 - love.graphics.getFont():getWidth(depth) / 2
+    local cy = y + DepthCounterPixelH / 2 - love.graphics.getFont():getHeight() / 2
+    View:text(depth, cx, cy)
+  end
 end
 
 function M.alphabet(x, y)
@@ -194,8 +197,6 @@ function M.room()
     for _, entity in ipairs(room.entities) do
       View:entity(entity, startX + (entity.position_x - 1) * scale, startY + (entity.position_y - 1) * scale)
     end
-
-    M.depth_counter(10, 10, Engine.room.depth)
   end
 end
 
