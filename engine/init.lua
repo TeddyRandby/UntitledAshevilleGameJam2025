@@ -76,6 +76,12 @@ local M = {
   enemy_shield = 0,
 }
 
+function M:create_random_page(num_verb, num_adverb, num_subject)
+  local page = Page.create(num_verb, num_adverb, num_subject)
+  return page
+end
+
+
 function M:heal(amount)
 	print("Healing", amount)
 	self.player_health = math.min(self.player_health + amount, self.player_max_health)

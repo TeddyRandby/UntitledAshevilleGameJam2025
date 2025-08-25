@@ -7,39 +7,6 @@ local room_width = 8
 local room_height = 6
 local room_keys = {}
 
-local function deep_print(tbl, indent, visited) --TODO Gross, for debug
-  indent = indent or 0
-  visited = visited or {}
-
-  if visited[tbl] then
-    print(string.rep("  ", indent) .. "*recursive reference*")
-    return
-  end
-  visited[tbl] = true
-
-  for k, v in pairs(tbl) do
-    local keyStr = tostring(k)
-    if type(v) == "table" then
-      print(string.rep("  ", indent) .. keyStr .. " = {")
-      deep_print(v, indent + 1, visited)
-      print((string.rep("  ", indent) .. "}"))
-    else
-      print((string.rep("  ", indent) .. keyStr .. " = " .. tostring(v)))
-    end
-  end
-end
-
-
-local function describe_room(room)
-  for y = 1, room_height  do
-    local str = ""
-    for x = 1, room_width do
-      str = str .. room.tiles[y][x].char
-    end
-    print(str)
-  end
-end
-
 for _, v in pairs(RoomTypes) do
 	M[v.type] = v
   room_keys[#room_keys+1] = v.type
@@ -95,22 +62,18 @@ function M.check_collision_tile(entity, dx, dy, room)
   local tile_x, tile_y = math.floor(new_x+sign(dx)), math.floor(new_y+sign(dy))
   local tile = room.tiles[tile_y][tile_x]
 
-  if tile.type == "door" and entity.type == "player" then
+  if tile.kind == "door" and entity.type == "player" then
       if new_x < 2 then
         M.move_through_door(room, "left", "right", entity)
-        entity.position_x = room_width - 2
-        entity.position_y = room_height / 2
+        entity.position_x = room_width - 1
       elseif new_y < 2 then
         M.move_through_door(room, "up", "down", entity)
-        entity.position_x = room_width / 2
-        entity.position_y = room_height - 2
+        entity.position_y = room_height - 1
       elseif new_x > room_width - 1 then
         M.move_through_door(room, "right", "left", entity)
         entity.position_x = 2
-        entity.position_y = room_height / 2
       elseif new_y > room_height - 1 then
         M.move_through_door(room, "down", "up", entity)
-        entity.position_x = room_width / 2
         entity.position_y = 2
       end
   end
@@ -139,6 +102,15 @@ function M.check_collision_entity(entity, dx, dy, room)
   return true
 end
 
+function M.insert_into_room(room, entity)
+  table.insert(room.entities, entity)
+  entity.id = #room.entities
+end 
+
+function M.remove_from_room(room, entity)
+  table.remove(room.entities, entity.id)
+end
+
 function M.create(type, player, depth)
 
   local connects = {}
@@ -147,7 +119,7 @@ function M.create(type, player, depth)
     connects[k] = v
   end
 
-  local room = {
+  local new_room = {
     tiles = new_grid(M[type].layout),
     entities = {player},
     neighbors = {},
@@ -165,17 +137,18 @@ function M.create(type, player, depth)
           entity.position_x = math.random(2, room_width - 1)
           entity.position_y = math.random(2, room_height - 1)
 
-          local tile = room.tiles[math.floor(entity.position_y)][math.floor(entity.position_x)]
+          local tile = new_room.tiles[math.floor(entity.position_y)][math.floor(entity.position_x)]
           if tile.walkable then
             placed = true
           end
         end
-        table.insert(room.entities, entity)
+
+        M.insert_into_room(new_room, entity)
       end
     end
   end
 
-  return room
+  return new_room
 end
 
 

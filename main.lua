@@ -3,6 +3,7 @@ require("util")
 UI = require("ui")
 View = require("view")
 Engine = require("engine")
+Room = require("data.room")
 
 function love.load()
   Engine:load()

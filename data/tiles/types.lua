@@ -15,8 +15,15 @@ return {
     walkable = true,
   },
   {
-    type = "door",
-    char = "D",
+    type = "ldoor",
+    kind = "door",
+    char = "L",
+    walkable = true,
+  },
+  {
+    type = "rdoor",
+    kind = "door",
+    char = "R",
     walkable = true,
   }
 }

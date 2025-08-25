@@ -3,10 +3,14 @@ local M = {}
 
 local FloorImage = love.graphics.newImage("resources/tiles/FloorTile.png")
 local WallImage = love.graphics.newImage("resources/tiles/WallTile.png")
+local DoorImage = love.graphics.newImage("resources/tiles/DoorLeftHalf.png")
+
 
 local function translate(tile)
     if tile.type == "floor" then
         return FloorImage   
+    elseif tile.kind == "door" then
+        return DoorImage
     elseif tile.type == "wall" then
         return WallImage
     else 
