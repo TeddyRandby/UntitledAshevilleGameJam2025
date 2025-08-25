@@ -20,12 +20,21 @@ function M.pixel_height()
 	return M.pixel_width() * M.wh_ratio()
 end
 
+local function get_base_dim()
+	return math.min(love.graphics.getWidth(), love.graphics.getHeight())
+end
+
+function M.scale()
+	local max = get_base_dim()
+	return max / 256
+end
+
 function M.sx()
-  return M.realize_x(M.pixel_width())
+  return M.scale()
 end
 
 function M.sy()
-  return M.realize_y(M.pixel_height())
+  return M.scale()
 end
 
 function M.scale_xy()
