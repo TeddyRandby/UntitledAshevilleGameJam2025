@@ -36,8 +36,12 @@ return {
       function()
         View:button(0.5, 0.5, "cast", function()
           Engine:player_cast()
+          Engine:scene_rewind()
         end)
       end,
+      Components.healthbar(0.01, 0.01, function()
+        return Engine.player_health / 3
+      end),
       Components.spell_in_progress(0.01, 0.2, function()
         return Engine.player_spell
       end),
@@ -55,6 +59,9 @@ return {
     {
     type = "room",
     layout = {
+      Components.healthbar(0.01, 0.01, function()
+        return Engine.player_health / 3
+      end),
       Components.room(),
     },
   },

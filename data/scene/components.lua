@@ -1,14 +1,54 @@
 local M = {}
 
----@param f fun(): number
-function M.healthbar(f)
-  ---@type Component
-  return function()
+local HealthbarSpritesheet = love.graphics.newImage("resources/HealthbarSpritesheet.png")
+local HealthbarSpritesheetPixelW = 32
+local HealthbarSpritesheetPixelH = 32
 
+local HealthbarFull = love.graphics.newQuad(
+	HealthbarSpritesheetPixelW * 0,
+	0,
+	HealthbarSpritesheetPixelW,
+	HealthbarSpritesheetPixelH,
+	HealthbarSpritesheet
+)
+local HealthbarTwoThirds = love.graphics.newQuad(
+	HealthbarSpritesheetPixelW * 1,
+	0,
+	HealthbarSpritesheetPixelW,
+	HealthbarSpritesheetPixelH,
+	HealthbarSpritesheet
+)
+local HealthbarOneThird = love.graphics.newQuad(
+	HealthbarSpritesheetPixelW * 2,
+	0,
+	HealthbarSpritesheetPixelW,
+	HealthbarSpritesheetPixelH,
+	HealthbarSpritesheet
+)
+local HealthbarEmpty = love.graphics.newQuad(
+	HealthbarSpritesheetPixelW * 3,
+	0,
+	HealthbarSpritesheetPixelW,
+	HealthbarSpritesheetPixelH,
+	HealthbarSpritesheet
+)
 
-  end
+---@param f fun(): number -- A function which returns how relatively healthy this bar should be
+function M.healthbar(x, y, f)
+	---@type Component
+	return function()
+		local relative_health = f()
+		if relative_health >= 1 then
+      View:spriteOf(HealthbarFull, HealthbarSpritesheet, x, y)
+		elseif relative_health >= 0.6 then
+      View:spriteOf(HealthbarTwoThirds, HealthbarSpritesheet, x, y)
+		elseif relative_health >= 0.3 then
+      View:spriteOf(HealthbarOneThird, HealthbarSpritesheet, x, y)
+		else
+      View:spriteOf(HealthbarEmpty, HealthbarSpritesheet, x, y)
+		end
+	end
 end
-
 
 local function getSpread(n)
 	local minSpread = math.rad(5)
@@ -27,7 +67,7 @@ function M.spell_in_progress(x, y, f)
 		local spell = f()
 
 		for _, v in ipairs(spell.phrases) do
-      -- TODO: FIgure out why the scaling here is not the same as in UI.text
+			-- TODO: FIgure out why the scaling here is not the same as in UI.text
 			for _, adv in ipairs(v.adverbs) do
 				View:spellword(adv, spellx, spelly)
 				spellx = spellx + Font:getWidth(adv.synonym) * (UI.sx() * 0.5)

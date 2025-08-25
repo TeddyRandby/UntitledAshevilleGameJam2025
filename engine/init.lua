@@ -31,6 +31,7 @@ local empty_spell = {
 ---@field rng love.RandomGenerator
 ---@field time integer
 ---@field enemy Enemy
+---@field player_health number
 ---@field player_spell_state "start" | "adverb" | "verb"
 ---@field player_spell Spell
 ---@field player_hand Page[]
@@ -59,6 +60,8 @@ local M = {
   player_dictionary = {},
 
   player_spell_state = "start",
+
+  player_health = 3,
 }
 
 --@param charset string
@@ -289,8 +292,8 @@ function M:load()
   self.player = Entity.create("player")
   self.room = Room.create("basic", self.player)
 
-  self:learn("abcdefghijklmnopqrstuvwxyz")
-  -- self:learn("flame")
+  -- self:learn("abcdefghijklmnopqrstuvwxyz")
+  self:learn("flame")
 
   table.insert(self.player_hand, Page.create(1, 0, 0))
   table.insert(self.player_hand, Page.create(1, 1, 0))

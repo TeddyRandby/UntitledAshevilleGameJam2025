@@ -132,7 +132,7 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
----@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spellword"
+---@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spriteof" | "spellword"
 
 ---@param id unknown
 function M:draggable(id)
@@ -427,6 +427,14 @@ function M:sprite(sprite, x, y)
 	self:push_renderable("sprite", sprite, {}, nil, x, y)
 end
 
+---@param sprite love.Quad
+---@param spritesheet love.Drawable
+---@param x integer
+---@param y integer
+function M:spriteOf(sprite, spritesheet, x, y)
+	self:push_renderable("spriteof", { sprite, spritesheet }, {}, nil, x, y)
+end
+
 ---@param x integer
 ---@param y integer
 ---@param f? fun(c: RenderCommand): boolean
@@ -485,6 +493,9 @@ function M:__drawcommand(v)
 	elseif t == "sprite" then
 		local pos = self.command_target_positions[v.id]
 		UI.sprite.draw(v.target, pos.x, pos.y)
+	elseif t == "spriteof" then
+		local pos = self.command_target_positions[v.id]
+		UI.sprite.drawof(v.target[1], v.target[2], pos.x, pos.y)
 	elseif t == "pageword" then
 		---@type Word
 		local word = v.target
