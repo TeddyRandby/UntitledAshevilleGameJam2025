@@ -76,8 +76,8 @@ local M = {
   enemy_shield = 0,
 }
 
-function M:create_random_page(num_verb, num_adverb, num_subject)
-  local page = Page.create(num_verb, num_adverb, num_subject)
+function M:create_random_page(n)
+  local page = Page.create_uniform(n)
   return page
 end
 

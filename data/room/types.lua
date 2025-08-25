@@ -9,7 +9,7 @@ return {
             "###LR###",
     },
     connects = {up=true, down=true, left=true, right=true},
-    entities = {{2,"enemy"}, {1,"letter_shrine"}},
+    entities = {{2,"enemy"}, {1,"page_shrine"}},
     neighbors = {}
   },
   {

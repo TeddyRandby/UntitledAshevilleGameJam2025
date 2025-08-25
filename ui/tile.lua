@@ -3,7 +3,7 @@ local M = {}
 
 local FloorImage = love.graphics.newImage("resources/tiles/FloorTile.png")
 local WallImage = love.graphics.newImage("resources/tiles/WallTile.png")
-local DoorImage = love.graphics.newImage("resources/tiles/DoorLeftHalf.png")
+local DoorImage = love.graphics.newImage("resources/tiles/DoorHalf.png")
 
 
 local function translate(tile)

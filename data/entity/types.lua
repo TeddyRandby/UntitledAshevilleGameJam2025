@@ -42,7 +42,7 @@ return {
     position_x = nil,
     position_y = nil,
     create = function(self)
-      self.page = Engine:create_random_page(1, 0, 0) --TODO: make these random
+      self.page = Engine:create_random_page(1)
     end,
     collision = function(self)
       table.insert(Engine.player_hand, self.page)
