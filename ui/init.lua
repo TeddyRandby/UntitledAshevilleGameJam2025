@@ -101,5 +101,6 @@ end
 M.button = require("ui.button")
 M.text = require("ui.text")
 M.page = require("ui.page")
+M.tile = require("ui.tile")
 
 return M

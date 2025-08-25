@@ -1,5 +1,5 @@
 ---@alias Component function
----@alias SceneType "main" | "combat"
+---@alias SceneType "main" | "combat" | "room"
 
 ---@class Scene
 ---@field type SceneType
@@ -20,6 +20,11 @@ return {
           Engine:scene_push("combat")
         end)
       end,
+      function()
+        View:button(0.5, 0.75, "Room", function()
+          Engine:scene_push("room")
+        end)
+      end,
     },
   },
   {
@@ -37,6 +42,12 @@ return {
           end,
         }
       end),
+    },
+  },
+    {
+    type = "room",
+    layout = {
+      Components.room(),
     },
   },
 }

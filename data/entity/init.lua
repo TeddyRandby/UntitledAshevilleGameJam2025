@@ -1,5 +1,5 @@
 
-local EntityTypes = require("data.entities.types")
+local EntityTypes = require("data.entity.types")
 
 local M = {}
 

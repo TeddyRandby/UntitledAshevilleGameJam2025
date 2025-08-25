@@ -1,6 +1,6 @@
 local M = {}
 
-local RoomTypes = require("data.rooms.types")
+local RoomTypes = require("data.room.types")
 local Tiles = require("data.tiles")
 
 local room_width = 20

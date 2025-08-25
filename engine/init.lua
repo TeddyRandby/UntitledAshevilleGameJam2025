@@ -1,5 +1,7 @@
 local Scene = require("data.scene")
 local Page = require("data.page")
+local Room = require("data.room")
+local Entity = require("data.entity")
 
 ---@class SpellPhrase
 ---@field type "damage" | "shield" | "status"
@@ -32,6 +34,9 @@ local M = {
     subjects = {},
     phrases = {},
   },
+
+  room = {},
+  player = {},
 }
 
 ---@param f fun(phrase: SpellPhrase)
@@ -170,12 +175,17 @@ function M:scene_rewindto(scene)
   -- self:__enterscene(self:current_scene())
 end
 
+
 function M:load()
   self.rng = love.math.newRandomGenerator(os.clock())
   table.insert(self.scene_stack, Scene.main)
   for _ = 0, 4 do
     table.insert(self.player_hand, Page.create(1, 1, 1))
   end
+
+    self.player = Entity.create("player")
+  self.room = Room.create("basic", self.player)
+
 end
 
 ---@param dt number

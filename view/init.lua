@@ -129,7 +129,7 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
----@alias RenderCommandType "button" | "text" | "page"
+---@alias RenderCommandType "button" | "text" | "page" | "tile"
 
 ---@param id unknown
 function M:draggable(id)
@@ -360,6 +360,10 @@ function M:page(page, x, y, r, ox, oy, t, delay)
   self:push_renderable("page", page, page, page_contains, x, y, r, ox, oy, t, delay)
 end
 
+function M:tile(tile, x, y)
+	self:push_renderable("tile", tile, {}, nil, x, y)
+end
+
 ---@param x integer
 ---@param y integer
 ---@param f? fun(c: RenderCommand): boolean
@@ -412,9 +416,12 @@ function M:__drawcommand(v)
     assert(text ~= nil)
 		local pos = self.command_target_positions[v.id]
 		UI.text.draw(pos.x, pos.y, text)
-  elseif t == "page" then
+  	elseif t == "page" then
 		local pos = self.command_target_positions[v.id]
 		UI.page.draw(v.target, pos.x, pos.y, pos.r)
+  	elseif t == "tile" then
+		local pos = self.command_target_positions[v.id]
+		UI.tile.draw(v.target, pos.x, pos.y)
 	elseif t == "button" then
 		local pos = self.command_target_positions[v.id]
 		UI.button.draw(pos.x, pos.y, v.target)
