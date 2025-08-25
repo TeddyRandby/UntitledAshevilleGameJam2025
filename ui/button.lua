@@ -24,13 +24,17 @@ function M.draw(x, y, text, limit)
 
 	love.graphics.translate(x, y)
 
+  local sx, sy = UI.scale_xy()
+  sx = sx * 0.3
+  sy = sy * 0.3
+
 	local w, h = M.getRealizedDim()
 
 	love.graphics.setColor(1, 1, 1, 1)
 
 	love.graphics.rectangle("line", 0, 0, w, h)
 
-	UI.text.draw(1, 1, text, limit)
+  love.graphics.printf(text:upper(), 1, 1, limit or w / sx, "center", 0, sx, sy)
 
 	love.graphics.pop()
 end

@@ -1,8 +1,5 @@
 local M = {}
 
-love.graphics.setDefaultFilter("nearest", "nearest")
-Font = love.graphics.newImageFont("resources/Font.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.")
-
 ---@param x integer
 ---@param y integer
 ---@param text string
@@ -11,7 +8,8 @@ Font = love.graphics.newImageFont("resources/Font.png", " abcdefghijklmnopqrstuv
 ---@param align? "center" | "justify" | "left" | "right"
 ---@param cx? integer -- An offset around which to rotate
 ---@param cy? integer -- An offset around which to rotate
-function M.draw(x, y, text, r, limit, align, cx, cy)
+---@param scale? number -- An offset around which to rotate
+function M.draw(x, y, text, r, limit, align, cx, cy, scale)
 	local str = ""
 	for i = 1, #text do
 		local c = text:sub(i, i)
@@ -24,12 +22,11 @@ function M.draw(x, y, text, r, limit, align, cx, cy)
 
 	local sx, sy = UI.scale_xy()
 
-	sx, sy = sx * 0.4, sy * 0.4
+	sx, sy = sx * (scale or 1), sy * (scale or 1)
 
 	love.graphics.push()
 
-	love.graphics.setFont(Font)
-	love.graphics.setColor(1, 0, 0)
+	love.graphics.setColor(0, 0, 0)
 
 	local w, h = Font:getWidth(str), Font:getHeight()
 	w, h = w * sx, h * sy

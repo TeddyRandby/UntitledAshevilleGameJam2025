@@ -1,4 +1,5 @@
 local flux = require("util.flux")
+local Word = require("ui.word")
 
 ---@alias UserEvent "click" | "dragstart" | "dragend" | "receive"
 
@@ -347,8 +348,9 @@ end
 ---@param text string
 ---@param x integer
 ---@param y integer
-function M:text(text, x, y)
-	self:push_renderable("text", text, {}, text_contains, x, y)
+---@param scale? integer
+function M:text(text, x, y, scale)
+	self:push_renderable("text", text, {}, text_contains, x, y, nil, nil, nil, nil, nil, scale)
 end
 
 ---@param word Word
@@ -361,7 +363,7 @@ end
 ---@param delay? number
 function M:pageword(word, x, y, r, ox, oy, t, delay)
 	assert(word ~= nil)
-	self:push_renderable("pageword", word, word, nil, x, y, r, ox, oy, t, delay)
+	self:push_renderable("pageword", word, word, nil, x, y, r, ox, oy, t, delay, Word.pageword_scale())
 end
 
 ---@param word Word
@@ -374,7 +376,7 @@ end
 ---@param delay? number
 function M:spellword(word, x, y, r, ox, oy, t, delay)
 	assert(word ~= nil)
-	self:push_renderable("spellword", word, word, nil, x, y, r, ox, oy, t, delay)
+	self:push_renderable("spellword", word, word, nil, x, y, r, ox, oy, t, delay, Word.spellword_scale())
 end
 
 ---@param page Page
@@ -398,7 +400,7 @@ function M:page(page, x, y, r, ox, oy, t, delay)
 
 	local pagew, pageh = UI.page.getRealizedDim()
 
-	thisx = thisx + UI.realize_x(UI.width(2))
+	thisx = thisx
 	thisy = thisy + (pageh * 0.4)
 
 	for _, word in ipairs(page.words) do
@@ -411,7 +413,7 @@ function M:page(page, x, y, r, ox, oy, t, delay)
 		-- on the page as they move.
 		self.command_target_positions[word].cx = x + pagew / 2
 		self.command_target_positions[word].cy = y + pageh / 2
-		thisy = thisy + 8 * UI.sy()
+		thisy = thisy + UI.sy() * 16 * Word.pageword_scale()
 	end
 end
 
@@ -491,7 +493,7 @@ function M:__drawcommand(v)
 		local text = v.target
 		assert(text ~= nil)
 		local pos = self.command_target_positions[v.id]
-		UI.text.draw(pos.x, pos.y, text)
+		UI.text.draw(pos.x, pos.y, text, pos.r, nil, nil, nil, nil, pos.scale)
 	elseif t == "page" then
 		local pos = self.command_target_positions[v.id]
 		UI.page.draw(v.target, pos.x, pos.y, pos.r)
@@ -505,12 +507,12 @@ function M:__drawcommand(v)
 		---@type Word
 		local word = v.target
 		local pos = self.command_target_positions[v.id]
-		UI.word.draw(pos.x, pos.y, word, pos.r, UI.realize_x(28), "center", pos.cx, pos.cy)
+		UI.word.draw(pos.x, pos.y, word, pos.r, 32 / pos.scale, "center", pos.cx, pos.cy, pos.scale)
 	elseif t == "spellword" then
 		---@type Word
 		local word = v.target
 		local pos = self.command_target_positions[v.id]
-		UI.word.draw(pos.x, pos.y, word, pos.r, nil, nil)
+		UI.word.draw(pos.x, pos.y, word, pos.r, nil, nil, nil, nil, pos.scale)
 	elseif t == "button" then
 		local pos = self.command_target_positions[v.id]
 		UI.button.draw(pos.x, pos.y, v.target)
