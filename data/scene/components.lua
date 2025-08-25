@@ -40,9 +40,10 @@ local DepthCounterPixelH = 64
 
 function M.depth_counter(x, y)
   return function()
+    local depthx, depthy = UI.realize_xy(x, y)
     local depth = Engine.room.depth
     depth = tostring(depth)
-    View:sprite(DepthCounter, x, y)
+    View:sprite(DepthCounter, depthx, depthy)
     local cx = x + DepthCounterPixelW / 2 - love.graphics.getFont():getWidth(depth) / 2
     local cy = y + DepthCounterPixelH / 2 - love.graphics.getFont():getHeight() / 2
     View:text(depth, cx, cy)
