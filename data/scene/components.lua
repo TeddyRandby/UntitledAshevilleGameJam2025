@@ -46,9 +46,9 @@ function M.healthbar(x, y, f)
 		local relative_health = f()
 		if relative_health >= 1 then
       View:spriteOf(HealthbarFull, HealthbarSpritesheet, x, y)
-		elseif relative_health >= 0.6 then
+		elseif relative_health >= 0.65 then
       View:spriteOf(HealthbarTwoThirds, HealthbarSpritesheet, x, y)
-		elseif relative_health >= 0.3 then
+		elseif relative_health >= 0.32 then
       View:spriteOf(HealthbarOneThird, HealthbarSpritesheet, x, y)
 		else
       View:spriteOf(HealthbarEmpty, HealthbarSpritesheet, x, y)
@@ -90,6 +90,20 @@ function M.spell_in_progress(x, y, f)
 			end
 		end
 	end
+end
+
+---@param x integer
+---@param y integer
+---@param f fun(): number, number
+function M.battle_info(x, y, f)
+	---@type Component
+	return function()
+    local infox, infoy = UI.realize_xy(x, y)
+    local damage, shield = f()
+
+    View:text(damage .. "DAMAGE", infox, infoy)
+    View:text(shield .. "SHIELD", infox, infoy + 40)
+  end
 end
 
 ---@param x integer
@@ -136,25 +150,17 @@ function M.hand(x, y, page_ueh)
 	end
 end
 
-
-
-
 function M.room()
 	---@type Component
 	return function()
-
-	
 		local room = Engine.room
 		local map_width = #room.tiles[1]
 		local map_height = #room.tiles
-
-		
 		local screenWidth = love.graphics.getWidth()
 		local screenHeight = love.graphics.getHeight()
 		local scale = math.min(screenWidth / map_width, screenHeight / map_height)
 		local startX = (screenWidth - map_width * scale) / 2
 		local startY = (screenHeight - map_height * scale) / 2
-		
 		for y = 1, map_height do
 			for x = 1, map_width do
 				View:tile(room.tiles[y][x], startX + (x-1)*(scale), startY + (y-1)*(scale))
