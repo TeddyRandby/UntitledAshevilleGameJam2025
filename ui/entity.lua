@@ -1,16 +1,13 @@
 
 local M = {}
 
-local FloorImage = love.graphics.newImage("resources/tiles/FloorTile.png")
-local WallImage = love.graphics.newImage("resources/tiles/WallTile.png")
+local PlayerImage = love.graphics.newImage("resources/ButterEnemy.png")
 
 local function translate(tile)
-    if tile.type == "floor" then
-        return FloorImage   
-    elseif tile.type == "wall" then
-        return WallImage
+    if tile.type == "player" then
+        return PlayerImage 
     else 
-        return FloorImage
+        return PlayerImage
     end 
 end
 
@@ -25,15 +22,15 @@ end
 	local screenWidth = love.graphics.getWidth()
 	local screenHeight = love.graphics.getHeight()
 	local scale = math.min(screenWidth / map_width , screenHeight / map_height)
-
 	love.graphics.draw(
 		image,
 		x,
 		y,
         0,
-        scale / pixelw,
-        scale / pixelh
-
+        scale/pixelw,
+        scale/pixelh
 	)
+
+    love.graphics.rectangle("line", x, y, scale,  scale)
   end
 return M

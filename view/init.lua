@@ -130,7 +130,7 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
----@alias RenderCommandType "button" | "text" | "page" | "tile"
+---@alias RenderCommandType "button" | "text" | "page" | "tile" | "entity"
 
 ---@param id unknown
 function M:draggable(id)
@@ -365,6 +365,10 @@ function M:tile(tile, x, y)
 	self:push_renderable("tile", tile, {}, nil, x, y)
 end
 
+function M:entity(entity, x, y)
+	self:push_renderable("entity", entity, {}, nil, x, y)
+end
+
 ---@param x integer
 ---@param y integer
 ---@param f? fun(c: RenderCommand): boolean
@@ -426,6 +430,9 @@ function M:__drawcommand(v)
 	elseif t == "button" then
 		local pos = self.command_target_positions[v.id]
 		UI.button.draw(pos.x, pos.y, v.target)
+	elseif t == "entity" then
+		local pos = self.command_target_positions[v.id]
+		UI.entity.draw(v.target, pos.x, pos.y)
 	else
 		assert(false, "Unhandled case")
 	end

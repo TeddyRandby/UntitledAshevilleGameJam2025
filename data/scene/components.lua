@@ -73,26 +73,33 @@ function M.hand(x, y, page_ueh)
   end
 end
 
+
+
+
 function M.room()
 	---@type Component
 	return function()
+
+	
 		local room = Engine.room
 		local map_width = #room.tiles[1]
 		local map_height = #room.tiles
+
+		
 		local screenWidth = love.graphics.getWidth()
 		local screenHeight = love.graphics.getHeight()
 		local scale = math.min(screenWidth / map_width, screenHeight / map_height)
 		local startX = (screenWidth - map_width * scale) / 2
 		local startY = (screenHeight - map_height * scale) / 2
+		
 		for y = 1, map_height do
 			for x = 1, map_width do
-				View:tile(room.tiles[y][x], x*32, y*32)
+				View:tile(room.tiles[y][x], startX + (x-1)*(scale), startY + (y-1)*(scale))
 			end
 		end
 
 		for _, entity in ipairs(room.entities) do
-			--local screenX, screenY  = get_screen_coords(entity.position.x, entity.position.y)
-			View:text("aaaaaaaaa", entity.position.x, entity.position.y)
+			View:entity(entity, startX + (entity.position_x-1)*scale, startY + (entity.position_y-1)*scale)
 		end
 	end
 end

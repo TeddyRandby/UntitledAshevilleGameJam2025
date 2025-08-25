@@ -243,6 +243,36 @@ function M:scene_rewindto(scene)
   -- self:__enterscene(self:current_scene())
 end
 
+function M:update_dungeon(dt)
+  local dx, dy, moved = 0, 0, false
+  if love.keyboard.isDown("w") then
+    dy = dy - 1
+    moved = true
+  end
+  if love.keyboard.isDown("s") then
+    dy = dy + 1
+    moved = true
+  end
+  if love.keyboard.isDown("a") then
+    dx = dx - 1
+    moved = true
+  end
+  if love.keyboard.isDown("d") then
+    dx = dx + 1
+    moved = true
+  end
+
+  if moved then
+    local dist_x  =  dx * self.player.speed * dt
+    local dist_y  = dy * self.player.speed * dt
+    if Room.check_collision_tile(self.player, dist_x, dist_y, self.room) and 
+       Room.check_collision_entity(self.player, dist_x, dist_y, self.room) then
+      self.player.position_x = self.player.position_x + dist_x
+      self.player.position_y = self.player.position_y + dist_y
+    end
+  end
+end
+
 
 function M:load()
   self.rng = love.math.newRandomGenerator(os.clock())
@@ -252,7 +282,7 @@ function M:load()
     table.insert(self.player_hand, Page.create(1, 1, 1))
   end
 
-    self.player = Entity.create("player")
+  self.player = Entity.create("player")
   self.room = Room.create("basic", self.player)
 
 
@@ -270,7 +300,7 @@ function M:update(dt)
   self.time = self.time + dt
 
   local scene = table.peek(self.scene_stack)
-
+  
   assert(scene ~= nil, "No scene found!")
   assert(#scene.layout ~= 0, "No components in scene")
 
@@ -282,6 +312,10 @@ function M:update(dt)
     table.append(self.scene_stack, self.scene_buffer)
     self.scene_buffer = {}
   end
+
+  if scene.type == "room" then
+    self:update_dungeon(dt)
+  end 
 end
 
 return M

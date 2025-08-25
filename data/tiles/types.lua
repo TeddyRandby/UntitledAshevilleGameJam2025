@@ -17,6 +17,6 @@ return {
   {
     type = "door",
     char = "D",
-    walkable = false,
+    walkable = true,
   }
 }
