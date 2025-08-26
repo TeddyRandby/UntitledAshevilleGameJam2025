@@ -86,6 +86,7 @@ function M:setup_combat(entity)
   self.player_shield = 0
   self.enemy_damage = 0
   self.enemy_shield = 0
+  self.player_spell = { phrases = {} }
 end
 
 function M:get_random_letter()
