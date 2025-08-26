@@ -32,6 +32,7 @@ return {
   {
     type = "corner",
     char = "C",
-    walkable = false
+    walkable = false,
+    rotates = true
   },
 }
