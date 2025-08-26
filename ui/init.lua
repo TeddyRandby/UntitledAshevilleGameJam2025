@@ -116,5 +116,6 @@ M.hand = require("ui.hand")
 M.entity = require("ui.entity")
 M.tile = require("ui.tile")
 M.anim = require("ui.anim")
+M.shadow = require("ui.shadow")
 
 return M

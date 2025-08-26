@@ -133,7 +133,7 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
----@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spriteof" | "spellword" | "entity" | "tile" | "anim"
+---@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spriteof" | "spellword" | "entity" | "tile" | "anim" | "shadow"
 
 ---@param id unknown
 function M:draggable(id)
@@ -452,17 +452,18 @@ function M:spriteOf(sprite, spritesheet, x, y)
 	self:push_renderable("spriteof", { sprite, spritesheet }, {}, nil, x, y)
 end
 
----@param entity any
----@param x integer
----@param y integer
----@param time? integer
----@param scale? integer
+function M:shadow(entity, x, y, scale)
+self:push_renderable("shadow", entity, {}, nil, x, y, nil, nil, nil, 0, nil, scale)
+end
+
 function M:entity(entity, x, y, scale, time)
+		self:shadow(entity,x,y,scale)
 	if entity.anim ~= nil then
 		self:anim(entity.anim, x, y, scale, nil, nil, time)
 	else
 		self:push_renderable("entity", entity, {}, nil, x, y, nil, nil, nil, time or 0, nil, scale)
 	end
+
 end
 
 ---@param x integer
@@ -548,6 +549,9 @@ function M:__drawcommand(v)
 	elseif t == "tile" then
 		local pos = self.command_target_positions[v.id]
 		UI.tile.draw(v.target, pos.x, pos.y)
+	elseif t == "shadow" then
+		local pos = self.command_target_positions[v.id]
+		UI.shadow.draw(v.target, pos.x, pos.y, pos.scale)
 	else
 		assert(false, "Unhandled case")
 	end
