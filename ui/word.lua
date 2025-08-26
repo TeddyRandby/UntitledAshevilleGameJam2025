@@ -26,6 +26,8 @@ function M.draw(x, y, word, r, limit, align, cx, cy, scale)
 	local sx, sy = UI.scale_xy()
 	sx, sy = sx * (scale or 1), sy * (scale or 1)
 
+  print("SCALETEXT", "sx", sx, "sy", sy, "scale", scale, "from", UI.scale_xy())
+
 	love.graphics.push()
 
 	love.graphics.setColor(1, 0, 0)

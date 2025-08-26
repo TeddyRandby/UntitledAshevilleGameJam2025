@@ -30,15 +30,21 @@ function M.scale()
 end
 
 function M.sx()
-  return M.scale()
+	return M.scale()
 end
 
 function M.sy()
-  return M.scale()
+	return M.scale()
 end
 
-function M.scale_xy()
-  return M.sx(), M.sy()
+---@param x? integer
+---@param y? integer
+function M.scale_xy(x, y)
+	if not x and not y then
+		return M.sx(), M.sy()
+	else
+		return M.sx() * x, M.sy() * y
+	end
 end
 
 ---@param pixels integer

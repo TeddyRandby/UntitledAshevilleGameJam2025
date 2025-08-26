@@ -346,27 +346,21 @@ function M:do_cast()
 	return function()
 		if Engine.casting_waiting ~= nil then
 			if View:post(Engine.casting_waiting).tween == nil then
-				print("TWEEN DONE")
 				Engine.casting_waiting = nil
 
-				if p then
-				else
-					print("SHIFTED Consequence")
+				if not p then
 					v = table.shift(cv)
 					if not v then
-						print("SHIFTED Phrase")
 						p = table.shift(phrases)
 						cv = {}
 					end
 				end
 			else
-				print("WAITING FOR TWEEN")
 				return
 			end
 		end
 
 		if p and not M:cast_phrase(p, cv) then
-			print("Awaiting adverb")
 			return
 		else
 			p = nil
@@ -378,10 +372,8 @@ function M:do_cast()
 		-- end
 
 		if v and not M:consequence(v) then
-			print("AWAITED VERB")
 			return
 		else
-			print("SHIFTED VERB")
 			v = table.shift(cv)
 			if v ~= nil then
 				return
@@ -570,8 +562,8 @@ function M:load()
 	self.player.id = 1
 	self.room = Room.create("basic", self.player, 1)
 
-	self:learn("abcdefghijklmnopqrstuvwxyz")
-	-- self:learn("flame")
+	-- self:learn("abcdefghijklmnopqrstuvwxyz")
+	self:learn("flame")
 
 	table.insert(self.player_deck, Page.create(1, 0, 0))
 	table.insert(self.player_deck, Page.create(1, 1, 0))

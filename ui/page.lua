@@ -8,8 +8,12 @@ local PageImage = love.graphics.newImage("resources/Page.png")
 M.pixelw = PageImage:getPixelWidth()
 M.pixelh = PageImage:getPixelHeight()
 
+function M.getScaledDim()
+	return UI.scale_xy(M.getPixelDim())
+end
+
 function M.getRealizedDim()
-	return UI.realize_xy(M.getNormalizedDim())
+	return M.getScaledDim()
 end
 
 function M.getNormalizedDim()
