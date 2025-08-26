@@ -16,7 +16,7 @@ function M._construct(options, n, dst)
 		assert(template ~= nil, "Invalid word type: " .. t)
 		local word = table.copy(template)
 		word.synonym = Word.synonym(t)
-    print(word.synonym)
+		print(word.synonym)
 		return word
 	end)
 end
@@ -51,18 +51,17 @@ end
 
 ---@param n integer
 function M.create_uniform(n)
-	local words = M.word(n)
-	local name = table.concat(
-		table.map(words, function(w)
-			return Word.synonym(w)
-		end),
-		"\n"
-	)
-	---@type Page
-	return {
-		name = name,
-		words = words,
-	}
+	local rng = Engine.rng:random(1, 3)
+
+	if rng <= 1 then
+		return M.create(1, 0, 0)
+	elseif rng <= 2 then
+		return M.create(0, 1, 0)
+	elseif rng <= 3 then
+		return M.create(0, 0, 1)
+	else
+		assert(false, "INVALID RANDOM THINGY")
+	end
 end
 
 ---@param sub integer

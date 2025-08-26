@@ -11,6 +11,7 @@ return {
     position_x = nil,
     position_y = nil,
     collision = function()
+      Engine:setup_combat()
       Engine:scene_push("combat")
     end
   },
@@ -45,7 +46,7 @@ return {
       self.page = Engine:create_random_page(1)
     end,
     collision = function(self)
-      table.insert(Engine.player_hand, self.page)
+      table.insert(Engine.player_deck, self.page)
       Room.remove_from_room(Engine.room, self)
     end
   }

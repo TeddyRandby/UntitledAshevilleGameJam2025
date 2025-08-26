@@ -21,7 +21,6 @@ function M.draw(x, y, text, r, limit, align, cx, cy, scale)
 	end
 
 	local sx, sy = UI.scale_xy()
-
 	sx, sy = sx * (scale or 1), sy * (scale or 1)
 
 	love.graphics.push()

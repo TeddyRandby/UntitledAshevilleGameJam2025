@@ -133,8 +133,7 @@ function M:__fire(id, e, x, y, data)
 	hs[e](x, y, data)
 end
 
-
----@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spriteof" | "spellword" | "entity" | "tile"
+---@alias RenderCommandType "button" | "text" | "page" | "pageword" | "sprite" | "spriteof" | "spellword" | "entity" | "tile" | "anim"
 
 ---@param id unknown
 function M:draggable(id)
@@ -353,6 +352,13 @@ function M:text(text, x, y, scale)
 	self:push_renderable("text", text, {}, text_contains, x, y, nil, nil, nil, nil, nil, scale)
 end
 
+---@param anim any
+---@param x integer
+---@param y integer
+function M:anim(anim, x, y)
+	self:push_renderable("anim", anim, anim, nil, x, y, nil, nil, nil, 0)
+end
+
 ---@param word Word
 ---@param x integer
 ---@param y integer
@@ -420,7 +426,7 @@ end
 ---@param x integer
 ---@param y integer
 function M:tile(tile, x, y, scale)
-  self:push_renderable("tile", tile, {}, nil, x, y)
+	self:push_renderable("tile", tile, {}, nil, x, y)
 end
 
 ---@param sprite love.Drawable
@@ -497,6 +503,9 @@ function M:__drawcommand(v)
 	elseif t == "page" then
 		local pos = self.command_target_positions[v.id]
 		UI.page.draw(v.target, pos.x, pos.y, pos.r)
+	elseif t == "anim" then
+		local pos = self.command_target_positions[v.id]
+		UI.anim.draw(v.target, pos.x, pos.y, pos.scale)
 	elseif t == "sprite" then
 		local pos = self.command_target_positions[v.id]
 		UI.sprite.draw(v.target, pos.x, pos.y)
@@ -534,6 +543,9 @@ function M:draw()
 	local scene = Engine:current_scene()
 	if scene.backdrop then
 		local sx, sy = UI.scale_xy()
+
+		sx = love.graphics.getWidth() / 256
+		sy = love.graphics.getHeight() / 128
 
 		love.graphics.draw(scene.backdrop, 0, 0, 0, sx, sy)
 	end
