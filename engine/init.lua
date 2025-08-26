@@ -200,7 +200,11 @@ function M:cast_phrase(phrase, consequences)
 				value = v.apply(value, consequences)
 				View:transform(v, nil, 0.8, nil, 2)
 				View:transform(adverb, nil, 0.8, 0.2, 2)
-				Engine.casting_waiting = adverb or v
+				Engine.casting_waiting = adverb
+				return false
+			else
+				View:transform(v, nil, 0.8, nil, -2)
+				Engine.casting_waiting = v
 				return false
 			end
 		else
@@ -395,6 +399,8 @@ end
 function M:setup_cast()
 	if self.player_spell_state ~= "start" then
 		-- Pop the incomplete spell
+    -- TODO: animate it off?
+    -- Make spell uncastable maybe?
 		table.pop(self.player_spell.phrases)
 		self.player_spell_state = "start"
 	end
@@ -426,9 +432,28 @@ function M:play(i)
 	self:play_page(page)
 end
 
+local word_limit = 5
+
 ---@param page Page
 function M:playable_page(page)
 	local word = page.words[1]
+
+  local nwords = 0
+  for _, v in ipairs(self.player_spell.phrases) do
+    nwords = nwords + #v.adverbs
+
+    if v.subject then
+      nwords = nwords + 1
+    end
+
+    if v.verb then
+      nwords = nwords + 1
+    end
+  end
+
+	if nwords >= word_limit then
+		return false
+	end
 
 	if self.player_spell_state == "start" then
 		return Word.isAdverb(word) or Word.isVerb(word)

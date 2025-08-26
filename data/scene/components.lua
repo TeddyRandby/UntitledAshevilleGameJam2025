@@ -56,7 +56,7 @@ function M.alphabet(x, y)
 	---@type Component
 	return function()
 		local thisx, thisy = UI.realize_xy(x, y)
-		View:sprite(ScrollImage, thisx, thisy, 1)
+		-- View:sprite(ScrollImage, thisx, thisy, 1)
 
 		thisx = thisx + UI.realize_x(0.04)
 		for i = 1, #Engine.player_alphabet do
@@ -105,36 +105,70 @@ function M.spell_in_progress(x, y, f)
 		local phrases = {}
 		table.append(phrases, spell.phrases)
 
-		for _, v in ipairs(phrases) do
-			thisx = spellx
+		local words = {}
+		for _, phrase in ipairs(phrases) do
+			table.append(words, phrase.adverbs)
 
-			local words = table.copy(v.adverbs)
-			if v.verb then
-				table.insert(words, v.verb)
-			end
-			if v.subject then
-				table.insert(words, v.subject)
+			if phrase.verb then
+				table.insert(words, phrase.verb)
 			end
 
-			local totalw = 0
-			for _, word in ipairs(words) do
-				totalw = totalw + Font:getWidth(Engine:decode(word.synonym)) * (UI.sx() * Word.spellword_scale())
+			if phrase.subject then
+				table.insert(words, phrase.subject)
 			end
-
-			local spritew = (UI.realize_x(UI.normalize_x(ScrollImage:getWidth())))
-
-			View:sprite(ScrollImage, thisx - spritew + totalw, thisy, 2, v, -spritew, thisy)
-
-			thisx = thisx + UI.realize_x(0.06)
-			thisy = thisy + UI.realize_y(0.055)
-
-			for _, word in ipairs(words) do
-				View:spellword(word, thisx, thisy)
-				thisx = thisx + Font:getWidth(Engine:decode(word.synonym)) * (UI.sx() * Word.spellword_scale())
-			end
-
-			thisy = thisy + Font:getHeight() * (UI.sy() * Word.spellword_scale())
 		end
+
+		local totalw = 0
+		for _, word in ipairs(words) do
+			totalw = totalw + Font:getWidth(Engine:decode(word.synonym)) * (UI.sx() * Word.spellword_scale())
+		end
+
+		local spritew = UI.scale() * ScrollImage:getWidth()
+		View:sprite(ScrollImage, thisx - spritew + totalw + (UI.scale() * 16), thisy, nil, "spell", -spritew, thisy)
+
+    thisx = thisx + UI.scale() * 4
+    thisy = thisy + UI.scale() * 8
+
+    for _, word in ipairs(words) do
+      View:spellword(word, thisx, thisy)
+      thisx = thisx + Font:getWidth(Engine:decode(word.synonym)) * (UI.sx() * Word.spellword_scale())
+    end
+
+    return
+
+		-- local phrases = {}
+		-- table.append(phrases, spell.phrases)
+		--
+		-- for _, v in ipairs(phrases) do
+		-- 	thisx = spellx
+		--
+		-- 	local words = table.copy(v.adverbs)
+		-- 	if v.verb then
+		-- 		table.insert(words, v.verb)
+		-- 	end
+		-- 	if v.subject then
+		-- 		table.insert(words, v.subject)
+		-- 	end
+		--
+		-- 	local totalw = 0
+		-- 	for _, word in ipairs(words) do
+		-- 		totalw = totalw + Font:getWidth(Engine:decode(word.synonym)) * (UI.sx() * Word.spellword_scale())
+		-- 	end
+		--
+		-- 	local spritew = UI.scale() * ScrollImage:getWidth()
+		--
+		-- 	View:sprite(ScrollImage, thisx - spritew + totalw + (UI.scale() * 16), thisy, nil, v, -spritew, thisy)
+		--
+		-- 	thisx = thisx + UI.scale() * 4
+		-- 	thisy = thisy + UI.scale() * 8
+		--
+		-- 	for _, word in ipairs(words) do
+		-- 		View:spellword(word, thisx, thisy)
+		-- 		thisx = thisx + Font:getWidth(Engine:decode(word.synonym)) * (UI.sx() * Word.spellword_scale())
+		-- 	end
+		--
+		-- 	thisy = thisy + Font:getHeight() * (UI.sy() * Word.spellword_scale())
+		-- end
 	end
 end
 
