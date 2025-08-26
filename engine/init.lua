@@ -303,7 +303,7 @@ function M:player_cast()
   if self.player_spell_state ~= "start" then
     -- Pop the incomplete spell
     table.pop(self.player_spell.phrases)
-    self.player_spell_State = "stsrt"
+    self.player_spell_state = "start"
   end
 
   ---@type SpellConsequence[]
