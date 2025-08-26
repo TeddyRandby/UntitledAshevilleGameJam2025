@@ -13,8 +13,8 @@ return {
     speed = 5,
     position_x = nil,
     position_y = nil,
-    collision = function()
-      Engine:setup_combat()
+    collision = function(self)
+      Engine:setup_combat(self)
       Engine:scene_push("combat")
     end
   },

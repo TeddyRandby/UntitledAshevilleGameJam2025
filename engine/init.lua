@@ -17,9 +17,6 @@ local Word = require("data.word")
 ---@class Spell
 ---@field phrases SpellPhrase[]
 
----@class Enemy
----@field spell Spell
-
 local empty_spell = {
   phrases = {},
   words = {},
@@ -30,7 +27,6 @@ local empty_spell = {
 ---@field scene_buffer Scene[]
 ---@field rng love.RandomGenerator
 ---@field time integer
----@field enemy Enemy
 ---@field player_health number
 ---@field player_spell_state "start" | "adverb" | "verb"
 ---@field player_spell Spell
@@ -82,7 +78,9 @@ function M:create_random_page(n)
   return page
 end
 
-function M:setup_combat()
+function M:setup_combat(entity)
+  self.player.anim:setAnimation("idle_right")
+  self.enemy = entity
   self.player_hand = table.copy(self.player_deck)
 end
 
@@ -305,6 +303,7 @@ function M:player_cast()
   if self.player_spell_state ~= "start" then
     -- Pop the incomplete spell
     table.pop(self.player_spell.phrases)
+    self.player_spell_State = "stsrt"
   end
 
   ---@type SpellConsequence[]
