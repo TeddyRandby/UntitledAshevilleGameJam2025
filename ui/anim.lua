@@ -73,6 +73,13 @@ function M.create_player()
 			} },
 			frameDuration = 30 / 1000,
 		},
+    cast = {
+      frames = {{
+        linha = 5,
+        frames = table_of_n(27),
+      }},
+			frameDuration = 100 / 1000,
+    },
 	})
 end
 
