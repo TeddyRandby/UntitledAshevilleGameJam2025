@@ -3,8 +3,8 @@ local M = {}
 local RoomTypes = require("data.room.types")
 local Tiles = require("data.tiles")
 
-local room_width = 8
-local room_height = 6
+local room_width = 10
+local room_height = 8
 local room_keys = {}
 
 for _, v in pairs(RoomTypes) do
@@ -17,7 +17,7 @@ local function new_grid(layout)
   for y = 1, room_height  do
     grid[y] = {}
     for x = 1, room_width do
-      grid[y][x] = Tiles.create_from_char(string.sub(layout[y], x, x))
+      grid[y][x] = Tiles.create_from_char(string.sub(layout[y], x, x), x, y, room_height, room_width)
     end
   end
   return grid
@@ -63,18 +63,18 @@ function M.check_collision_tile(entity, dx, dy, room)
   local tile = room.tiles[tile_y][tile_x]
 
   if tile.kind == "door" and entity.type == "player" then
-      if new_x < 2 then
+      if new_x < 3 then
         M.move_through_door(room, "left", "right", entity)
-        entity.position_x = room_width - 1
-      elseif new_y < 2 then
+        entity.position_x = room_width - 2
+      elseif new_y < 3 then
         M.move_through_door(room, "up", "down", entity)
-        entity.position_y = room_height - 1
-      elseif new_x > room_width - 1 then
+        entity.position_y = room_height - 2
+      elseif new_x > room_width - 2 then
         M.move_through_door(room, "right", "left", entity)
-        entity.position_x = 2
-      elseif new_y > room_height - 1 then
+        entity.position_x = 3
+      elseif new_y > room_height - 2 then
         M.move_through_door(room, "down", "up", entity)
-        entity.position_y = 2
+        entity.position_y = 3
       end
   end
 

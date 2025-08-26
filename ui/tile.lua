@@ -1,35 +1,22 @@
 
 local M = {}
 
-local FloorImage = love.graphics.newImage("resources/tiles/FloorTile.png")
-local WallImage = love.graphics.newImage("resources/tiles/WallTile.png")
-local DoorImage = love.graphics.newImage("resources/tiles/DoorHalf.png")
-
-
-local function translate(tile)
-    if tile.type == "floor" then
-        return FloorImage   
-    elseif tile.kind == "door" then
-        return DoorImage
-    elseif tile.type == "wall" then
-        return WallImage
-    else 
-        return FloorImage
-    end 
-end
-
   function M.draw(tile, x, y)
-    local image = translate(tile)
+    local image = tile.image
 	local scale = UI.sx()
 
-	love.graphics.draw(
-		image,
-		x,
-		y,
-        0,
-        scale,
-        scale
+    if image then
+        local w = image:getPixelWidth()*scale
+        local h = image:getPixelHeight()*scale
 
-	)
+        local cx, cy = w / 2, h / 2
+        love.graphics.push()
+        love.graphics.translate(x + cx, y + cy)
+        love.graphics.rotate(math.rad(tile.rotate))
+        love.graphics.translate(-cx, -cy)
+        love.graphics.scale(scale, scale)
+        love.graphics.draw(image)
+        love.graphics.pop()
+    end
   end
 return M

@@ -18,6 +18,10 @@ end
   function M.draw(entity, x, y)
     local image = translate(entity)
 
+    local width = image:getPixelWidth()
+    local height = image:getPixelHeight()
+
+
     local scale = UI.sx()
 	love.graphics.draw(
 		image,
