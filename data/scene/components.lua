@@ -44,8 +44,8 @@ function M.depth_counter(x, y)
 		local depth = Engine.room.depth
 		depth = tostring(depth)
 		View:sprite(DepthCounter, depthx, depthy)
-		local cx = x + DepthCounterPixelW / 2 - love.graphics.getFont():getWidth(depth) / 2
-		local cy = y + DepthCounterPixelH / 2 - love.graphics.getFont():getHeight() / 2
+		local cx = depthx + DepthCounterPixelW * UI.sx() / 3
+		local cy = depthy + DepthCounterPixelH * UI.sy() / 3
 		View:text(depth, cx, cy)
 	end
 end
@@ -130,7 +130,6 @@ function M.battle_info(x, y, f)
 		local damage, shield = f()
 
 		local txt = damage .. "DAMAGE\n" .. shield .. "SHIELD"
-		print(txt)
 		View:text(txt, infox, infoy, 0.5)
 	end
 end

@@ -41,7 +41,6 @@ function M.move_through_door(room, going, coming, entity)
 
     while not found do 
       potential_type = table.replacement_sample(room_keys, 1)
-      Deep_print(potential_type)
       local potential_room = M[potential_type[1]]
       if potential_room.connects[coming] then
         found = true
