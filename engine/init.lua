@@ -82,12 +82,10 @@ function M:setup_combat(entity)
   self.player.anim:setAnimation("idle_right")
   self.enemy = entity
   self.player_hand = table.copy(self.player_deck)
-end
-
-
-function M:heal(amount)
-	print("Healing", amount)
-	self.player_health = math.min(self.player_health + amount, self.player_max_health)
+  self.player_damage = 0
+  self.player_shield = 0
+  self.enemy_damage = 0
+  self.enemy_shield = 0
 end
 
 function M:get_random_letter()
@@ -323,6 +321,21 @@ function M:player_cast()
   end
 
   self.player_spell = { phrases = {} }
+end
+
+--- Decode a string given the players current dictionary
+---@param string string
+function M:decode(string)
+	local str = ""
+	for i = 1, #string do
+		local c = string:sub(i, i)
+		if Engine.player_dictionary[c] ~= nil then
+			str = str .. string.upper(c)
+		else
+			str = str .. c
+		end
+	end
+  return str
 end
 
 --- Play the ith page in the players hand.

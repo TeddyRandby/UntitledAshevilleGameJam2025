@@ -423,7 +423,7 @@ function M:page(page, x, y, r, ox, oy, t, delay)
 		-- on the page as they move.
 		self.command_target_positions[word].cx = x + pagew / 2
 		self.command_target_positions[word].cy = y + pageh / 2
-		thisy = thisy + UI.sy() * 16 * Word.pageword_scale()
+		thisy = thisy + Font:getHeight() * UI.sy() * Word.pageword_scale()
 	end
 end
 
@@ -436,8 +436,9 @@ end
 ---@param sprite love.Drawable
 ---@param x integer
 ---@param y integer
-function M:sprite(sprite, x, y)
-	self:push_renderable("sprite", sprite, {}, nil, x, y)
+---@param scale? integer
+function M:sprite(sprite, x, y, scale)
+	self:push_renderable("sprite", sprite, {}, nil, x, y, nil, nil, nil, nil, nil, scale)
 end
 
 ---@param sprite love.Quad
@@ -455,7 +456,7 @@ end
 ---@param scale? integer
 function M:entity(entity, x, y, scale, time)
 	if entity.anim ~= nil then
-    self:anim(entity.anim, x, y, scale, nil, nil, time)
+		self:anim(entity.anim, x, y, scale, nil, nil, time)
 	else
 		self:push_renderable("entity", entity, {}, nil, x, y, nil, nil, nil, time or 0, nil, scale)
 	end
@@ -521,7 +522,7 @@ function M:__drawcommand(v)
 		UI.anim.draw(v.target, pos.x, pos.y, pos.scale)
 	elseif t == "sprite" then
 		local pos = self.command_target_positions[v.id]
-		UI.sprite.draw(v.target, pos.x, pos.y)
+		UI.sprite.draw(v.target, pos.x, pos.y, pos.scale)
 	elseif t == "spriteof" then
 		local pos = self.command_target_positions[v.id]
 		UI.sprite.drawof(v.target[1], v.target[2], pos.x, pos.y)
@@ -552,13 +553,13 @@ function M:__drawcommand(v)
 end
 
 function M:update(dt)
-  for _, v in ipairs(self.commands) do
-    if v.type == "anim" then
-      v.target:update(dt)
-    end
-  end
+	for _, v in ipairs(self.commands) do
+		if v.type == "anim" then
+			v.target:update(dt)
+		end
+	end
 
-  flux.update(dt)
+	flux.update(dt)
 end
 
 -- TODO: Updating dragging positions *here* causes some real confusing behavior.
