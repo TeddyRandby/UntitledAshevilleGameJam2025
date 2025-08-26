@@ -102,7 +102,10 @@ function M.spell_in_progress(x, y, f)
 		local thisy = spelly
 		local thisx = spellx
 
-		for _, v in ipairs(spell.phrases) do
+		local phrases = {}
+		table.append(phrases, spell.phrases)
+
+		for _, v in ipairs(phrases) do
 			thisx = spellx
 
 			local words = table.copy(v.adverbs)

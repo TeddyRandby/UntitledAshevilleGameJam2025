@@ -253,6 +253,65 @@ end
 ---@field drag? fun(x: integer, y: integer)
 ---@field click? fun(x: integer, y: integer)
 
+---@param id unknown
+---@param r? number
+---@param time? number
+---@param delay? number
+---@param scale? number
+function M:transform(id, r, time, delay, scale)
+	local existing = self.command_target_positions[id]
+	assert(existing ~= nil, "Cannot transform nonexistant id")
+
+	scale = scale or 1
+	time = time or 2
+	delay = delay or 0
+	r = r or 0
+
+	local original_scale = existing.scale
+	local original_r = existing.r
+
+	-- if existing.r == r and existing.scale == scale then
+	-- 	--- Nothing to tween
+	-- 	return
+	-- end
+
+	if not existing.tween then
+		existing.tween = flux
+			.to(existing, time, { r = r, scale = scale })
+			:ease("sineinout") -- Experiement with the easing function
+			:delay(delay)
+			:oncomplete(function()
+				-- Tween back
+				existing.tween = flux
+					.to(existing, time, { r = original_r, scale = original_scale })
+					:ease("sineinout") -- Experiement with the easing function
+					:oncomplete(function()
+						print("[COMPLETETWEEN]", id, r, scale)
+						existing.tween = nil
+					end)
+			end)
+	else
+		existing.tween:oncomplete(function()
+			if existing.r ~= r or existing.scale ~= scale then
+				existing.tween = flux
+					.to(existing, time, { r = r, scale = scale })
+					:ease("sineinout") -- Experiement with the easing function
+					:delay(delay)
+					:oncomplete(function()
+						-- Tween back
+						existing.tween = flux
+							.to(existing, time, { r = original_r, scale = original_scale })
+							:ease("sineinout") -- Experiement with the easing function
+							:oncomplete(function()
+								print("[COMPLETETWEEN]", id, r, scale)
+								existing.tween = nil
+							end)
+					end)
+			end
+		end)
+	end
+end
+
 ---@param type RenderCommandType
 ---@param target unknown
 ---@param id unknown
@@ -276,28 +335,12 @@ function M:push_renderable(type, target, id, contain_f, x, y, r, ox, oy, time, d
 	x, y = M.normalize_xy(x, y)
 
 	if not existing then
-		existing = { x = ox and M.normalize_x(ox) or x, y = oy and M.normalize_y(oy) or y, r = r or 0, scale = scale }
+		existing = { x = ox and M.normalize_x(ox) or x, y = oy and M.normalize_y(oy) or y, r = r, scale = scale }
 		self.command_target_positions[id] = existing
 	else
 		-- This version fixes card bug but creates slow-feeling ui
 		if not existing.tween then
 			if existing.x ~= x or existing.y ~= y or existing.r ~= r or existing.scale ~= scale then
-				-- if existing.x ~= x then
-				-- 	print("[TWEENX]", existing.x, x)
-				-- end
-				--
-				-- if existing.y ~= y then
-				-- 	print("[TWEENY]", existing.y, y)
-				-- end
-				--
-				-- if existing.r ~= r then
-				-- 	print("[TWEENR]", existing.r, r)
-				-- end
-				--
-				-- if existing.scale ~= scale then
-				-- 	print("[TWEENS]", existing.scale, scale)
-				-- end
-
 				existing.tween = flux
 					.to(existing, time, { x = x, y = y, r = r, scale = scale })
 					:ease("sineinout") -- Experiement with the easing function
