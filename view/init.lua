@@ -423,7 +423,7 @@ function M:page(page, x, y, r, ox, oy, t, delay)
 		-- on the page as they move.
 		self.command_target_positions[word].cx = x + pagew / 2
 		self.command_target_positions[word].cy = y + pageh / 2
-		thisy = thisy + UI.sy() * 16 * Word.pageword_scale()
+		thisy = thisy + Font:getHeight() * UI.sy() * Word.pageword_scale()
 	end
 end
 
@@ -456,7 +456,7 @@ end
 ---@param scale? integer
 function M:entity(entity, x, y, scale, time)
 	if entity.anim ~= nil then
-    self:anim(entity.anim, x, y, scale, nil, nil, time)
+		self:anim(entity.anim, x, y, scale, nil, nil, time)
 	else
 		self:push_renderable("entity", entity, {}, nil, x, y, nil, nil, nil, time or 0, nil, scale)
 	end
@@ -553,13 +553,13 @@ function M:__drawcommand(v)
 end
 
 function M:update(dt)
-  for _, v in ipairs(self.commands) do
-    if v.type == "anim" then
-      v.target:update(dt)
-    end
-  end
+	for _, v in ipairs(self.commands) do
+		if v.type == "anim" then
+			v.target:update(dt)
+		end
+	end
 
-  flux.update(dt)
+	flux.update(dt)
 end
 
 -- TODO: Updating dragging positions *here* causes some real confusing behavior.

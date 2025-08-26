@@ -322,6 +322,21 @@ function M:player_cast()
   self.player_spell = { phrases = {} }
 end
 
+--- Decode a string given the players current dictionary
+---@param string string
+function M:decode(string)
+	local str = ""
+	for i = 1, #string do
+		local c = string:sub(i, i)
+		if Engine.player_dictionary[c] ~= nil then
+			str = str .. string.upper(c)
+		else
+			str = str .. c
+		end
+	end
+  return str
+end
+
 --- Play the ith page in the players hand.
 ---@param i integer
 function M:play(i)

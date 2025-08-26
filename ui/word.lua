@@ -21,15 +21,7 @@ function M.draw(x, y, word, r, limit, align, cx, cy, scale)
 	local depth = 2
 	local skew = depth / 100
 
-	local str = ""
-	for i = 1, #word.synonym do
-		local c = word.synonym:sub(i, i)
-		if Engine.player_dictionary[c] ~= nil then
-			str = str .. string.upper(c)
-		else
-			str = str .. c
-		end
-	end
+  local str = Engine:decode(word.synonym)
 
 	local sx, sy = UI.scale_xy()
 	sx, sy = sx * (scale or 1), sy * (scale or 1)

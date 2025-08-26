@@ -1,6 +1,8 @@
 local Word = require("ui.word")
 local M = {}
 
+local ScrollImage = love.graphics.newImage("resources/Scroll.png")
+
 local HealthbarSpritesheet = love.graphics.newImage("resources/HealthbarSpritesheet.png")
 local HealthbarSpritesheetPixelW = 32
 local HealthbarSpritesheetPixelH = 32
@@ -54,10 +56,13 @@ function M.alphabet(x, y)
 	---@type Component
 	return function()
 		local thisx, thisy = UI.realize_xy(x, y)
+    View:sprite(ScrollImage, thisx, thisy, 1)
+
+    thisx = thisx + UI.realize_x(0.04)
 		for i = 1, #Engine.player_alphabet do
-			local letter = Engine.player_alphabet:sub(i, i)
-			View:text(letter, thisx, thisy, 0.8)
-			thisx = thisx + Font:getWidth(letter) * (UI.sx() * 0.8)
+			local letter = Engine:decode(Engine.player_alphabet:sub(i, i))
+			View:text(letter, thisx, thisy + UI.realize_y(0.025), 0.5)
+			thisx = thisx + Font:getWidth(letter) * (UI.sx() * 0.5)
 		end
 	end
 end
@@ -85,8 +90,6 @@ local function getSpread(n)
 	return minSpread + (maxSpread - minSpread) * ((n - 1) / 4)
 end
 
-local ScrollImage = love.graphics.newImage("resources/Scroll.png")
-
 ---@param x integer
 ---@param y integer
 ---@param f fun(): Spell
@@ -99,23 +102,25 @@ function M.spell_in_progress(x, y, f)
 		local thisy = spelly
     local thisx = spellx
 
-    View:sprite(ScrollImage, spellx, spelly, 2)
-
 		for _, v in ipairs(spell.phrases) do
+      thisx = spellx
+
 			for _, adv in ipairs(v.adverbs) do
 				View:spellword(adv, thisx, thisy)
-				thisx = thisx + Font:getWidth(adv.synonym) * (UI.sx() * Word.spellword_scale())
+				thisx = thisx + Font:getWidth(Engine:decode(adv.synonym)) * (UI.sx() * Word.spellword_scale())
 			end
 
 			if v.verb then
 				View:spellword(v.verb, thisx, thisy)
-				thisx = thisx + Font:getWidth(v.verb.synonym) * (UI.sx() * Word.spellword_scale())
+				thisx = thisx + Font:getWidth(Engine:decode(v.verb.synonym)) * (UI.sx() * Word.spellword_scale())
 			end
 
 			if v.subject then
 				View:spellword(v.subject, thisx, thisy)
-				thisx = thisx + Font:getWidth(v.subject.synonym) * (UI.sx() * Word.spellword_scale())
+				thisx = thisx + Font:getWidth(Engine:decode(v.subject.synonym)) * (UI.sx() * Word.spellword_scale())
 			end
+
+      thisy = thisy + Font:getHeight() * (UI.sy() * Word.spellword_scale())
 		end
 	end
 end
