@@ -75,6 +75,23 @@ function M.create_flourenemy()
 	return animation
 end
 
+local milk_ss  = love.graphics.newImage("resources/MilkEnemy.png")
+function M.create_milkenemy()
+	local animation = anim.new(milk_ss, 32, 32, {
+		idle = {
+			frames = { {
+				linha = 1,
+				frames = table_of_n(5),
+			} },
+			frameDuration = 180 / 1000,
+		},
+	})
+
+	animation:setAnimation("idle")
+
+	return animation
+end
+
 local player_ss = love.graphics.newImage("resources/player_anim.png")
 function M.create_player()
 	return anim.new(player_ss, 32, 32, {
