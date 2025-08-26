@@ -7,9 +7,26 @@ local function table_of_n(n)
 	end)
 end
 
+local page_ss = love.graphics.newImage("resources/pageDrop.png")
+function M.create_pagedrop()
+	local animation = anim.new(page_ss, 16, 16, {
+		idle = {
+			frames = { {
+				linha = 1,
+				frames = table_of_n(16),
+			} },
+			frameDuration = 100 / 1000,
+		},
+	})
+
+  animation:setAnimation("idle")
+
+  return animation
+end
+
+local player_ss = love.graphics.newImage("resources/player_anim.png")
 function M.create_player()
-	local spritesheet = love.graphics.newImage("resources/player_anim.png")
-	return anim.new(spritesheet, 32, 32, {
+	return anim.new(player_ss, 32, 32, {
 		idle_right = {
 			frames = { {
 				linha = 1,

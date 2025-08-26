@@ -199,9 +199,9 @@ function M.room()
 		end
 
 		for _, entity in ipairs(room.entities) do
-			if entity == Engine.player then
+			if entity.anim then
 				View:anim(
-					Engine.player_anim,
+					entity.anim,
 					startX + (entity.position_x - 1) * scale,
 					startY + (entity.position_y - 1) * scale
 				)

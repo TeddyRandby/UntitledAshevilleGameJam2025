@@ -129,7 +129,7 @@ end
 function M.insert_into_room(room, entity)
   table.insert(room.entities, entity)
   entity.id = #room.entities
-end 
+end
 
 function M.remove_from_room(room, entity)
   table.remove(room.entities, entity.id)

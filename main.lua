@@ -15,8 +15,7 @@ end
 
 function love.update(dt)
   Engine:update(dt)
-
-  require("util.flux").update(dt)
+  View:update(dt)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)

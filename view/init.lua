@@ -355,8 +355,12 @@ end
 ---@param anim any
 ---@param x integer
 ---@param y integer
-function M:anim(anim, x, y)
-	self:push_renderable("anim", anim, anim, nil, x, y, nil, nil, nil, 0)
+---@param scale? integer
+---@param ox? integer
+---@param oy? integer
+---@param time? integer
+function M:anim(anim, x, y, scale, ox, oy, time)
+	self:push_renderable("anim", anim, anim, nil, x, y, nil, ox, oy, time or 0, nil, scale)
 end
 
 ---@param word Word
@@ -444,8 +448,17 @@ function M:spriteOf(sprite, spritesheet, x, y)
 	self:push_renderable("spriteof", { sprite, spritesheet }, {}, nil, x, y)
 end
 
-function M:entity(entity, x, y)
-	self:push_renderable("entity", entity, {}, nil, x, y)
+---@param entity any
+---@param x integer
+---@param y integer
+---@param time? integer
+---@param scale? integer
+function M:entity(entity, x, y, scale, time)
+	if entity.anim ~= nil then
+    self:anim(entity.anim, x, y, scale, nil, nil, time)
+	else
+		self:push_renderable("entity", entity, {}, nil, x, y, nil, nil, nil, time or 0, nil, scale)
+	end
 end
 
 ---@param x integer
@@ -527,7 +540,7 @@ function M:__drawcommand(v)
 		UI.button.draw(pos.x, pos.y, v.target)
 	elseif t == "entity" then
 		local pos = self.command_target_positions[v.id]
-		UI.entity.draw(v.target, pos.x, pos.y)
+		UI.entity.draw(v.target, pos.x, pos.y, pos.scale)
 	elseif t == "tile" then
 		local pos = self.command_target_positions[v.id]
 		UI.tile.draw(v.target, pos.x, pos.y)
@@ -536,6 +549,16 @@ function M:__drawcommand(v)
 	end
 
 	love.graphics.pop()
+end
+
+function M:update(dt)
+  for _, v in ipairs(self.commands) do
+    if v.type == "anim" then
+      v.target:update(dt)
+    end
+  end
+
+  flux.update(dt)
 end
 
 -- TODO: Updating dragging positions *here* causes some real confusing behavior.

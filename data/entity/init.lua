@@ -26,5 +26,6 @@ function M.create(type)
   return potential_entity
 end
 
+Entity = M
 
 return M

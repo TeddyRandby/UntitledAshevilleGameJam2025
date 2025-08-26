@@ -13,8 +13,8 @@ return {
     speed = 5,
     position_x = nil,
     position_y = nil,
-    collision = function(self)
-      Engine:setup_combat(self)
+    collision = function()
+      Engine:setup_combat()
       Engine:scene_push("combat")
     end
   },
@@ -33,8 +33,6 @@ return {
     type = "health_shrine",
     position_x = nil,
     position_y = nil,
-    w = 1,
-    h = 2,
     collision = function(self)
       Engine:heal(1)
       Room.remove_from_room(Engine.room, self)
@@ -44,8 +42,8 @@ return {
     type = "letter_shrine",
     position_x = nil,
     position_y = nil,
-    w = 1,
-    h = 2,
+    size_x = 1,
+    size_y = 2,
     create = function(self)
       self.letter = Engine:get_random_letter()
     end,
@@ -58,8 +56,6 @@ return {
     type = "page_shrine",
     position_x = nil,
     position_y = nil,
-    w = 1,
-    h = 2,
     create = function(self)
       self.page = Entity.create("page_drop")
     end,

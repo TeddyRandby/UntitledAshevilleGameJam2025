@@ -16,15 +16,10 @@ local _, NormalizedPageHeight = UI.page.getNormalizedDim()
 return {
 	{
 		type = "main",
-    backdrop_name = "StartScreen.png",
+		backdrop_name = "StartScreen.png",
 		layout = {
 			function()
 				View:button(0.5, 0.5, "play", function()
-					Engine:scene_push("combat")
-				end)
-			end,
-			function()
-				View:button(0.5, 0.75, "Room", function()
 					Engine:scene_push("room")
 				end)
 			end,
@@ -44,6 +39,12 @@ return {
 				View:button(-0.1, -0.1, "back", function()
 					Engine:scene_rewind()
 				end)
+			end,
+			function()
+				local x, y = UI.realize_xy(0.1, 0.4)
+				View:entity(Engine.player, x, y, 3, 1)
+				x, y = UI.realize_xy(-0.1 - UI.normalize_x(32), 0.4)
+				View:entity(Engine.enemy, x, y, 3, 1)
 			end,
 			Components.alphabet(0.2, 0.01),
 			Components.healthbar(0.01, 0.01, function()
