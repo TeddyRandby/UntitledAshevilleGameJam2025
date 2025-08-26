@@ -10,10 +10,12 @@ return {
 	},
 	{
 		type = "enemy_butter",
-    spritename = "ButterEnemy.png",
 		speed = 5,
 		position_x = nil,
 		position_y = nil,
+    create = function(self)
+			self.anim = UI.anim.create_butterenemy()
+    end,
 		collision = function(self)
 			Engine:scene_push("combat")
       Engine:setup_combat(self)
@@ -66,6 +68,9 @@ return {
 		speed = 5,
 		position_x = nil,
 		position_y = nil,
+    create = function(self)
+      self.anim = UI.anim.create_flourenemy()
+    end,
 		collision = function(self)
 			Engine:setup_combat(self)
 			Engine:scene_push("combat")

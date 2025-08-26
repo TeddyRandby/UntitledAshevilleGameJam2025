@@ -41,6 +41,39 @@ function M.create_pagedrop()
 
 	return animation
 end
+local butter_ss = love.graphics.newImage("resources/ButterEnemy.png")
+function M.create_butterenemy()
+	local animation = anim.new(butter_ss, 32, 32, {
+		idle = {
+			frames = { {
+				linha = 1,
+				frames = table_of_n(5),
+			} },
+			frameDuration = 180 / 1000,
+		},
+	})
+
+	animation:setAnimation("idle")
+
+	return animation
+end
+
+local flour_ss  = love.graphics.newImage("resources/FlourEnemy.png")
+function M.create_flourenemy()
+	local animation = anim.new(flour_ss, 32, 32, {
+		idle = {
+			frames = { {
+				linha = 1,
+				frames = table_of_n(9),
+			} },
+			frameDuration = 180 / 1000,
+		},
+	})
+
+	animation:setAnimation("idle")
+
+	return animation
+end
 
 local player_ss = love.graphics.newImage("resources/player_anim.png")
 function M.create_player()
