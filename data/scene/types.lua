@@ -16,6 +16,7 @@ local _, NormalizedPageHeight = UI.page.getNormalizedDim()
 return {
 	{
 		type = "main",
+    backdrop_name = "StartScreen.png",
 		layout = {
 			function()
 				View:button(0.5, 0.5, "play", function()

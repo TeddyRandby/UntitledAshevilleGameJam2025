@@ -289,13 +289,13 @@ end
 
 ---@generic T
 ---@param n integer
----@param f? fun(): T
+---@param f? fun(n?: integer): T
 ---@return T[]
 function table.of(n, f)
 	local tmp = {}
 
-	for _ = 1, n do
-		table.insert(tmp, f and f() or nil)
+	for i = 1, n do
+		table.insert(tmp, f and f(i) or nil)
 	end
 
 	return tmp

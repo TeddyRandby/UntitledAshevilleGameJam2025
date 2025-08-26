@@ -34,13 +34,14 @@ local empty_spell = {
 ---@field player_health number
 ---@field player_spell_state "start" | "adverb" | "verb"
 ---@field player_spell Spell
----@field player_hand Page[]
+---@field player_deck Page[]
 ---@field player_damage number
 ---@field player_shield number
 ---@field enemy_damage number
 ---@field enemy_shield number
 ---@field player_dictionary table<string, boolean>
 ---@field player_alphabet string
+---@field player_anim any
 local M = {
   time = 0,
   --- The actual stack of scenes.
@@ -54,6 +55,7 @@ local M = {
   },
 
   --- The list of pages in the players hand
+  player_deck = {},
   player_hand = {},
 
   room = {},
@@ -79,6 +81,10 @@ local M = {
 function M:create_random_page(n)
   local page = Page.create_uniform(n)
   return page
+end
+
+function M:setup_combat()
+  self.player_hand = table.copy(self.player_deck)
 end
 
 
@@ -399,6 +405,8 @@ function M:scene_rewindto(scene)
 end
 
 function M:update_dungeon(dt)
+  self.player_anim:update(dt)
+
   local dx, dy, moved = 0, 0, false
   if love.keyboard.isDown("w") then
     dy = dy - 1
@@ -411,10 +419,13 @@ function M:update_dungeon(dt)
   if love.keyboard.isDown("a") then
     dx = dx - 1
     moved = true
-  end
-  if love.keyboard.isDown("d") then
+    self.player_anim:setAnimation("walk_left")
+  elseif not love.keyboard.isDown("d")then
+    self.player_anim:setAnimation("idle_left")
+  elseif love.keyboard.isDown("d") then
     dx = dx + 1
     moved = true
+    self.player_anim:setAnimation("walk_right")
   end
 
   if moved then
@@ -451,7 +462,9 @@ function M:load()
     alphabet = alphabet:gsub("1", letter_b)
   end
 
-  Engine.player_alphabet = alphabet
+  self.player_alphabet = alphabet
+
+  self.player_anim = require("ui.anim").create_player()
 
   love.mouse.setVisible(false)
 
@@ -463,11 +476,11 @@ function M:load()
   -- self:learn("abcdefghijklmnopqrstuvwxyz")
   self:learn("flame")
 
-  table.insert(self.player_hand, Page.create(1, 0, 0))
-  table.insert(self.player_hand, Page.create(1, 1, 0))
-  table.insert(self.player_hand, Page.create(0, 1, 1))
-  table.insert(self.player_hand, Page.create(0, 1, 1))
-  table.insert(self.player_hand, Page.create(1, 1, 0))
+  table.insert(self.player_deck, Page.create(1, 0, 0))
+  table.insert(self.player_deck, Page.create(1, 1, 0))
+  table.insert(self.player_deck, Page.create(0, 1, 1))
+  table.insert(self.player_deck, Page.create(0, 1, 1))
+  table.insert(self.player_deck, Page.create(1, 1, 0))
 end
 
 ---@param dt number
