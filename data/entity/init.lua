@@ -15,11 +15,11 @@ function M.create(type)
     potential_entity.create(potential_entity)
   end
   
-  if not potential_entity.size_x then
-    potential_entity.size_x = 1
+  if not potential_entity.w then
+    potential_entity.w = 1
   end
-  if not potential_entity.size_y then
-    potential_entity.size_y = 1
+  if not potential_entity.h then
+    potential_entity.h = 1
   end
 
 

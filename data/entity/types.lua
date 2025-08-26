@@ -19,6 +19,8 @@ return {
     type = "health_shrine",
     position_x = nil,
     position_y = nil,
+    w = 1,
+    h = 2,
     collision = function(self)
       Engine:heal(1)
       Room.remove_from_room(Engine.room, self)
@@ -28,8 +30,8 @@ return {
     type = "letter_shrine",
     position_x = nil,
     position_y = nil,
-    size_x = 1,
-    size_y = 2,
+    w = 1,
+    h = 2,
     create = function(self)
       self.letter = Engine:get_random_letter()
     end,
@@ -42,6 +44,8 @@ return {
     type = "page_shrine",
     position_x = nil,
     position_y = nil,
+    w = 1,
+    h = 2,
     create = function(self)
       self.page = Engine:create_random_page(1)
     end,

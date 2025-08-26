@@ -18,10 +18,6 @@ end
   function M.draw(entity, x, y)
     local image = translate(entity)
 
-    local width = image:getPixelWidth()
-    local height = image:getPixelHeight()
-
-
     local scale = UI.sx()
 	love.graphics.draw(
 		image,
@@ -32,6 +28,6 @@ end
         scale
 	)
 
-    love.graphics.rectangle("line", x, y, scale*32*entity.size_x,  scale*32*entity.size_y)
+    love.graphics.rectangle("line", x, y, scale*32*entity.w,  scale*32*entity.h)
   end
 return M

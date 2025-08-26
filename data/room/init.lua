@@ -4,7 +4,7 @@ local RoomTypes = require("data.room.types")
 local Tiles = require("data.tiles")
 
 local room_width = 10
-local room_height = 8
+local room_height = 6
 local room_keys = {}
 
 for _, v in pairs(RoomTypes) do
@@ -23,9 +23,9 @@ local function new_grid(layout)
   return grid
 end
 
-local function sign(n)
+local function sign(n, val)
   if n > 0 then
-    return 1
+    return 0.5
   else
     return 0
   end
@@ -40,14 +40,15 @@ function M.move_through_door(room, going, coming, entity)
     local potential_type = nil
 
     while not found do 
-      potential_type = room_keys[math.random(1, #room_keys)]
-      local potential_room = M[potential_type]
+      potential_type = table.replacement_sample(room_keys, 1)
+      Deep_print(potential_type)
+      local potential_room = M[potential_type[1]]
       if potential_room.connects[coming] then
         found = true
       end
     end
 
-    local next_room = M.create(potential_type, entity, room.depth + 1)
+    local next_room = M.create(potential_type[1], entity, room.depth + 1)
     room.neighbors[going] = next_room
     next_room.neighbors[coming] = room
     Engine.room = next_room
@@ -63,25 +64,47 @@ function M.check_collision_tile(entity, dx, dy, room)
   local tile = room.tiles[tile_y][tile_x]
 
   if tile.kind == "door" and entity.type == "player" then
+    local offset = 1.5
       if new_x < 3 then
         M.move_through_door(room, "left", "right", entity)
-        entity.position_x = room_width - 2
+        entity.position_x = room_width - offset + 1
       elseif new_y < 3 then
         M.move_through_door(room, "up", "down", entity)
-        entity.position_y = room_height - 2
+        entity.position_y = room_height - offset + 1
       elseif new_x > room_width - 2 then
         M.move_through_door(room, "right", "left", entity)
-        entity.position_x = 3
+        entity.position_x = offset
       elseif new_y > room_height - 2 then
         M.move_through_door(room, "down", "up", entity)
-        entity.position_y = 3
+        entity.position_y = offset
       end
   end
-
   return tile.walkable
 end
 
-local epsilon = 0.1
+local epsilon = 0.5
+
+local function CheckOverlap(x1, y1, w1, h1, x2, y2, w2, h2, e)
+    if not e then e = epsilon end
+
+    if x1 + w1 < x2 + e then
+        return false
+    end
+
+    if x1 > x2 + w2 - e then
+        return false
+    end
+
+    if y1 + h1 < y2 + e then
+        return false
+    end
+
+    if y1 > y2 + h2 - e then
+        return false
+    end
+
+    return true
+end
 
 function M.check_collision_entity(entity, dx, dy, room)
   local new_x  = entity.position_x + dx
@@ -89,7 +112,8 @@ function M.check_collision_entity(entity, dx, dy, room)
 
   for _, other in ipairs(room.entities) do
     if other ~= entity then
-      if math.abs(new_x - other.position_x) < 1 - epsilon and math.abs(new_y - other.position_y) < 1 - epsilon then
+      if CheckOverlap(new_x, new_y, entity.w, entity.h,
+                      other.position_x, other.position_y, other.w, other.h) then
         if other.collision then
           other.collision(other)
         end
