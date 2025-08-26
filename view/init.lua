@@ -436,8 +436,9 @@ end
 ---@param sprite love.Drawable
 ---@param x integer
 ---@param y integer
-function M:sprite(sprite, x, y)
-	self:push_renderable("sprite", sprite, {}, nil, x, y)
+---@param scale? integer
+function M:sprite(sprite, x, y, scale)
+	self:push_renderable("sprite", sprite, {}, nil, x, y, nil, nil, nil, nil, nil, scale)
 end
 
 ---@param sprite love.Quad
@@ -521,7 +522,7 @@ function M:__drawcommand(v)
 		UI.anim.draw(v.target, pos.x, pos.y, pos.scale)
 	elseif t == "sprite" then
 		local pos = self.command_target_positions[v.id]
-		UI.sprite.draw(v.target, pos.x, pos.y)
+		UI.sprite.draw(v.target, pos.x, pos.y, pos.scale)
 	elseif t == "spriteof" then
 		local pos = self.command_target_positions[v.id]
 		UI.sprite.drawof(v.target[1], v.target[2], pos.x, pos.y)

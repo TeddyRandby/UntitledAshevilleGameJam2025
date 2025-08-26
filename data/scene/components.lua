@@ -85,6 +85,8 @@ local function getSpread(n)
 	return minSpread + (maxSpread - minSpread) * ((n - 1) / 4)
 end
 
+local ScrollImage = love.graphics.newImage("resources/Scroll.png")
+
 ---@param x integer
 ---@param y integer
 ---@param f fun(): Spell
@@ -95,11 +97,11 @@ function M.spell_in_progress(x, y, f)
 
 		local spell = f()
 		local thisy = spelly
+    local thisx = spellx
 
-		print("LOADING " .. #spell.phrases .. " PHRASES")
+    View:sprite(ScrollImage, spellx, spelly, 2)
+
 		for _, v in ipairs(spell.phrases) do
-			local thisx = spellx
-
 			for _, adv in ipairs(v.adverbs) do
 				View:spellword(adv, thisx, thisy)
 				thisx = thisx + Font:getWidth(adv.synonym) * (UI.sx() * Word.spellword_scale())
@@ -114,8 +116,6 @@ function M.spell_in_progress(x, y, f)
 				View:spellword(v.subject, thisx, thisy)
 				thisx = thisx + Font:getWidth(v.subject.synonym) * (UI.sx() * Word.spellword_scale())
 			end
-
-			thisy = thisy + UI.sy() * 16 * Word.spellword_scale()
 		end
 	end
 end
