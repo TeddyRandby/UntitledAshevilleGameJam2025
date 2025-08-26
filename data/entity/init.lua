@@ -14,7 +14,7 @@ function M.create(type)
   if potential_entity.create then
     potential_entity.create(potential_entity)
   end
-  
+
   if not potential_entity.size_x then
     potential_entity.size_x = 1
   end
@@ -26,5 +26,6 @@ function M.create(type)
   return potential_entity
 end
 
+Entity = M
 
 return M

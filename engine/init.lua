@@ -41,7 +41,6 @@ local empty_spell = {
 ---@field enemy_shield number
 ---@field player_dictionary table<string, boolean>
 ---@field player_alphabet string
----@field player_anim any
 local M = {
   time = 0,
   --- The actual stack of scenes.
@@ -112,8 +111,6 @@ function M:learn(charset)
 		local c = charset:sub(i, i)
 		self.player_dictionary[c] = true
 		self.player_unlearned = string.gsub(self.player_unlearned, c, '')
-		print("Learned letter:", c)
-		print("Remaining letters:", self.player_unlearned)
 	end
 end
 
@@ -405,7 +402,6 @@ function M:scene_rewindto(scene)
 end
 
 function M:update_dungeon(dt)
-  self.player_anim:update(dt)
 
   local dx, dy, moved = 0, 0, false
   if love.keyboard.isDown("w") then
@@ -419,13 +415,13 @@ function M:update_dungeon(dt)
   if love.keyboard.isDown("a") then
     dx = dx - 1
     moved = true
-    self.player_anim:setAnimation("walk_left")
+    self.player.anim:setAnimation("walk_left")
   elseif not love.keyboard.isDown("d")then
-    self.player_anim:setAnimation("idle_left")
+    self.player.anim:setAnimation("idle_left")
   elseif love.keyboard.isDown("d") then
     dx = dx + 1
     moved = true
-    self.player_anim:setAnimation("walk_right")
+    self.player.anim:setAnimation("walk_right")
   end
 
   if moved then
@@ -504,6 +500,7 @@ function M:update(dt)
   if scene.type == "room" then
     self:update_dungeon(dt)
   end
+
 end
 
 return M

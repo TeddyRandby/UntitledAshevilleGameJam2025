@@ -355,8 +355,10 @@ end
 ---@param anim any
 ---@param x integer
 ---@param y integer
-function M:anim(anim, x, y)
-	self:push_renderable("anim", anim, anim, nil, x, y, nil, nil, nil, 0)
+---@param ox? integer
+---@param oy? integer
+function M:anim(anim, x, y, ox, oy)
+	self:push_renderable("anim", anim, anim, nil, x, y, nil, ox, oy, 0)
 end
 
 ---@param word Word
@@ -445,7 +447,11 @@ function M:spriteOf(sprite, spritesheet, x, y)
 end
 
 function M:entity(entity, x, y)
-	self:push_renderable("entity", entity, {}, nil, x, y)
+	if entity.anim ~= nil then
+    self:anim(entity.anim, x, y)
+	else
+		self:push_renderable("entity", entity, {}, nil, x, y)
+	end
 end
 
 ---@param x integer
@@ -536,6 +542,16 @@ function M:__drawcommand(v)
 	end
 
 	love.graphics.pop()
+end
+
+function M:update(dt)
+  for _, v in ipairs(self.commands) do
+    if v.type == "anim" then
+      v.target:update(dt)
+    end
+  end
+
+  flux.update(dt)
 end
 
 -- TODO: Updating dragging positions *here* causes some real confusing behavior.
