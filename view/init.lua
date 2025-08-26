@@ -25,6 +25,7 @@ local Word = require("ui.word")
 ---@field commands RenderCommand[]
 ---@field dragging Dragging?
 ---@field command_target_positions table<RenderCommandTarget, RenderPosition>
+---@field one_off_animation RenderCommand[]
 local M = {
 	user_event_handlers = {},
 	last_frame_commands = {},
@@ -504,7 +505,7 @@ function M:entity(entity, x, y, scale, time)
 	if entity.anim ~= nil then
 		self:anim(entity.anim, x, y, scale, nil, nil, time)
 	else
-		self:push_renderable("entity", entity, {}, nil, x, y, nil, nil, nil, time or 0, nil, scale)
+		self:push_renderable("entity", entity, entity, nil, x, y, nil, nil, nil, time or 0, nil, scale)
 	end
 end
 

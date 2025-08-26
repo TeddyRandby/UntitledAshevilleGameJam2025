@@ -4,6 +4,8 @@ local Room = require("data.room")
 local Entity = require("data.entity")
 local Word = require("data.word")
 
+local anim = require("ui.anim")
+
 ---@class SpellConsequence
 ---@field type VerbType
 ---@field value number
@@ -42,6 +44,7 @@ end
 ---@field enemy_shield number
 ---@field player_dictionary table<string, boolean>
 ---@field player_alphabet string
+---@field animations table[] 
 local M = {
 	time = 0,
 	--- The actual stack of scenes.
@@ -76,6 +79,8 @@ local M = {
 	player_shield = 0,
 	enemy_damage = 0,
 	enemy_shield = 0,
+
+  animations = {},
 }
 
 function M:create_random_page(n)
@@ -272,6 +277,21 @@ function M:consequence(v)
 
 	if consequence_type == "damage" then
 		self:damage(consequence_target, v.value)
+    local idx = #self.animations + 1
+
+    local explosion = anim.create_explosion(function(animation)
+      table.remove(self.animations, idx)
+    end)
+    table.insert(self.animations, explosion)
+
+    local targetanim = self.player.anim
+    if consequence_target == "enemy" then
+      targetanim = self.enemy
+    end
+
+    local pos = View:post(targetanim)
+    assert(pos ~= nil, "Player pos was nil")
+    View:anim(explosion, pos.x, pos.y, 2)
 	elseif consequence_type == "shield" then
 		self:shield(consequence_target, v.value)
 	elseif consequence_type == "strong" then

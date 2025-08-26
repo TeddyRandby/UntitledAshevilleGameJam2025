@@ -1,7 +1,13 @@
 local Animation = {}
 Animation.__index = Animation
 
-function Animation.new(image, frameWidth, frameHeight, animations, defaultFrameDuration)
+---@param image love.Image
+---@param frameWidth integer
+---@param frameHeight integer
+---@param animations table
+---@param defaultFrameDuration? number
+---@param oncompletef? function
+function Animation.new(image, frameWidth, frameHeight, animations, defaultFrameDuration, oncompletef)
     local obj = {
         image = image,
         frameWidth = frameWidth,
@@ -12,6 +18,7 @@ function Animation.new(image, frameWidth, frameHeight, animations, defaultFrameD
         elapsedTime = 0,
         currentFrame = 1,
         frameDurations = {}, -- Duração personalizada para cada animação
+        oncompletef = oncompletef,
     }
 
     -- Calcula os quads para cada animação com base nos índices fornecidos
@@ -64,6 +71,9 @@ function Animation:update(dt)
             self.currentFrame = self.currentFrame + 1
             if self.currentFrame > #self.animations[self.currentAnimation] then
                 self.currentFrame = 1
+                if self.oncompletef then
+                  self:oncompletef()
+                end
             end
         end
     end

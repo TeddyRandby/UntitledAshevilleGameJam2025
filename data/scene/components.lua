@@ -263,4 +263,14 @@ function M.room()
 	end
 end
 
+function M.animations()
+  return function()
+    for _, v in ipairs(Engine.animations) do
+      local pos = View:post(v)
+      assert(pos ~= nil, "Missing pos for animation")
+      View:anim(v, pos.x, pos.y, pos.scale)
+    end
+  end
+end
+
 return M
