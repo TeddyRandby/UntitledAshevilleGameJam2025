@@ -40,6 +40,9 @@ return {
 					Engine:scene_rewind()
 				end)
 			end,
+			Components.spell_in_progress(0.01, 0.2, function()
+				return Engine.player_spell
+			end),
 			function()
 				local x, y = UI.realize_xy(0.1, 0.4)
 				View:entity(Engine.player, x, y, 3, 1)
@@ -55,9 +58,6 @@ return {
 			end),
 			Components.battle_info(0.01, -0.2, function()
 				return Engine.enemy_damage, Engine.enemy_shield
-			end),
-			Components.spell_in_progress(0.01, 0.2, function()
-				return Engine.player_spell
 			end),
 			Components.hand(0.3, -NormalizedPageHeight * 0.8, function(i, p)
 				return {

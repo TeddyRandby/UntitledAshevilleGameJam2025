@@ -56,9 +56,9 @@ function M.alphabet(x, y)
 	---@type Component
 	return function()
 		local thisx, thisy = UI.realize_xy(x, y)
-    View:sprite(ScrollImage, thisx, thisy, 1)
+		View:sprite(ScrollImage, thisx, thisy, 1)
 
-    thisx = thisx + UI.realize_x(0.04)
+		thisx = thisx + UI.realize_x(0.04)
 		for i = 1, #Engine.player_alphabet do
 			local letter = Engine:decode(Engine.player_alphabet:sub(i, i))
 			View:text(letter, thisx, thisy + UI.realize_y(0.025), 0.5)
@@ -100,27 +100,37 @@ function M.spell_in_progress(x, y, f)
 
 		local spell = f()
 		local thisy = spelly
-    local thisx = spellx
+		local thisx = spellx
 
 		for _, v in ipairs(spell.phrases) do
-      thisx = spellx
+			thisx = spellx
 
-			for _, adv in ipairs(v.adverbs) do
-				View:spellword(adv, thisx, thisy)
-				thisx = thisx + Font:getWidth(Engine:decode(adv.synonym)) * (UI.sx() * Word.spellword_scale())
-			end
-
+			local words = table.copy(v.adverbs)
 			if v.verb then
-				View:spellword(v.verb, thisx, thisy)
-				thisx = thisx + Font:getWidth(Engine:decode(v.verb.synonym)) * (UI.sx() * Word.spellword_scale())
+				table.insert(words, v.verb)
 			end
-
 			if v.subject then
-				View:spellword(v.subject, thisx, thisy)
-				thisx = thisx + Font:getWidth(Engine:decode(v.subject.synonym)) * (UI.sx() * Word.spellword_scale())
+				table.insert(words, v.subject)
 			end
 
-      thisy = thisy + Font:getHeight() * (UI.sy() * Word.spellword_scale())
+			local totalw = 0
+			for _, word in ipairs(words) do
+				totalw = totalw + Font:getWidth(Engine:decode(word.synonym)) * (UI.sx() * Word.spellword_scale())
+			end
+
+			local spritew = (UI.realize_x(UI.normalize_x(ScrollImage:getWidth())))
+
+			View:sprite(ScrollImage, thisx - spritew + totalw, thisy, 2, v, -spritew, thisy)
+
+			thisx = thisx + UI.realize_x(0.06)
+			thisy = thisy + UI.realize_y(0.055)
+
+			for _, word in ipairs(words) do
+				View:spellword(word, thisx, thisy)
+				thisx = thisx + Font:getWidth(Engine:decode(word.synonym)) * (UI.sx() * Word.spellword_scale())
+			end
+
+			thisy = thisy + Font:getHeight() * (UI.sy() * Word.spellword_scale())
 		end
 	end
 end

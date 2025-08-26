@@ -437,8 +437,11 @@ end
 ---@param x integer
 ---@param y integer
 ---@param scale? integer
-function M:sprite(sprite, x, y, scale)
-	self:push_renderable("sprite", sprite, {}, nil, x, y, nil, nil, nil, nil, nil, scale)
+---@param id? unknown
+---@param ox? integer
+---@param oy? integer
+function M:sprite(sprite, x, y, scale, id, ox, oy)
+	self:push_renderable("sprite", sprite, id or {}, nil, x, y, nil, ox, oy, nil, nil, scale)
 end
 
 ---@param sprite love.Quad
