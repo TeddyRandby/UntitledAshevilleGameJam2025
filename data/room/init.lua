@@ -47,6 +47,7 @@ function M.move_through_door(room, going, coming, entity)
       end
     end
 
+ 
     local next_room = M.create(potential_type[1], entity, room.depth + 1)
     room.neighbors[going] = next_room
     next_room.neighbors[coming] = room
@@ -81,7 +82,7 @@ function M.check_collision_tile(entity, dx, dy, room)
   return tile.walkable
 end
 
-local epsilon = 0.5
+local epsilon = 0.4
 
 local function CheckOverlap(x1, y1, w1, h1, x2, y2, w2, h2, e)
     if not e then e = epsilon end
@@ -131,7 +132,19 @@ function M.insert_into_room(room, entity)
 end
 
 function M.remove_from_room(room, entity)
+  if entity.remove then
+		entity.remove(entity)
+	end
+
+  local id = entity.id
+
   table.remove(room.entities, entity.id)
+
+  for _, other in ipairs(room.entities) do
+    if other.id > id then
+      other.id = other.id - 1
+    end 
+  end
 end
 
 function M.create(type, player, depth)

@@ -18,7 +18,21 @@ return {
 			Engine:setup_combat(self)
 			Engine:scene_push("combat")
 		end,
-	},
+    remove = function(self)
+      local corpse = Entity.create("butter_corpse")
+      corpse.position_x = self.position_x
+      corpse.position_y = self.position_y
+      Room.insert_into_room(Engine.room, corpse)
+    end
+  },
+  {
+    type = "butter_corpse",
+    spritename = "ButterDead.png",
+		speed = 5,
+		position_x = nil,
+		position_y = nil,
+    walkable = true
+  },
 	{
 		type = "enemy_milk",
     -- spritename = "MilkEnemy.png",
@@ -30,7 +44,23 @@ return {
 			Engine:setup_combat(self)
 			Engine:scene_push("combat")
 		end,
+    remove = function(self)
+      local corpse = Entity.create("milk_corpse")
+      corpse.position_x = self.position_x
+      corpse.position_y = self.position_y
+      Room.insert_into_room(Engine.room, corpse)
+    end
 	},
+  {
+    type = "milk_corpse",
+    spritename = "MilkDead.png",
+		speed = 5,
+		position_x = nil,
+		position_y = nil,
+    w = 1,
+    h = 0.5,
+    walkable = true,
+  },
 	{
 		type = "enemy_flour",
     -- spritename = "FlourEnemy.png",
@@ -42,7 +72,21 @@ return {
 			Engine:setup_combat(self)
 			Engine:scene_push("combat")
 		end,
-	},
+    remove = function(self)
+      local corpse = Entity.create("flour_corpse")
+      corpse.position_x = self.position_x
+      corpse.position_y = self.position_y
+      Room.insert_into_room(Engine.room, corpse)
+    end
+  },
+  {
+    type = "flour_corpse",
+    spritename = "FlourDead.png",
+		speed = 5,
+		position_x = nil,
+		position_y = nil,
+    walkable = true
+  },
 	{
 		type = "page_drop",
 		create = function(self)

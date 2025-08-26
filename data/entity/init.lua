@@ -10,7 +10,7 @@ for _, v in ipairs(EntityTypes) do
 end
 
 function M.create(type)
-  assert(M[type] ~= nil, "MISSIN GENTITY TYPE: " .. type)
+  assert(M[type] ~= nil, "MISSING ENTITY TYPE: " .. type)
 	local potential_entity = table.copy(M[type])
 
 	if potential_entity.create then

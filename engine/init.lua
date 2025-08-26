@@ -317,8 +317,9 @@ function M:player_cast()
 
   if self.player_damage > self.enemy_damage then
     self.player_health = self.player_health - 1
-  elseif self.player_damage <= self.player_damage then
+  elseif self.enemy_damage > 0 then
     print("YOU WON")
+    Room.remove_from_room(self.room, self.enemy)
   end
 
   self.player_spell = { phrases = {} }
@@ -466,6 +467,7 @@ function M:load()
   table.insert(self.scene_stack, Scene.main)
 
 	self.player = Entity.create("player")
+  self.player.id = 1
 	self.room = Room.create("basic", self.player, 1)
 
   -- self:learn("abcdefghijklmnopqrstuvwxyz")

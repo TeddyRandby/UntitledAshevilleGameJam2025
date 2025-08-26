@@ -197,7 +197,7 @@ function M.room()
 			end
 		end
 
-		for _, entity in ipairs(room.entities) do
+		for _, entity in reversedipairs(room.entities) do
 			if entity.anim then
 				View:anim(
 					entity.anim,
