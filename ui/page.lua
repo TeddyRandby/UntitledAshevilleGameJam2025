@@ -8,8 +8,12 @@ local PageImage = love.graphics.newImage("resources/Page.png")
 M.pixelw = PageImage:getPixelWidth()
 M.pixelh = PageImage:getPixelHeight()
 
+function M.getScaledDim()
+	return UI.scale_xy(M.getPixelDim())
+end
+
 function M.getRealizedDim()
-	return UI.realize_xy(M.getNormalizedDim())
+	return M.getScaledDim()
 end
 
 function M.getNormalizedDim()
@@ -116,8 +120,8 @@ function M.draw(page, x, y, r)
 	if Engine:playable_page(page) then
 		love.graphics.draw(
 			PageMeshHL,
-			-UI.realize_x(UI.normalize_x(1)),
-			-UI.realize_y(UI.normalize_y(1)),
+			-UI.scale(),
+			-UI.scale(),
 			0,
 			(M.pixelw + 2) / M.pixelw,
 			(M.pixelh + 2) / M.pixelh

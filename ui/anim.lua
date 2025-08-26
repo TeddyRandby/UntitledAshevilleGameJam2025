@@ -7,6 +7,24 @@ local function table_of_n(n)
 	end)
 end
 
+local exp_ss = love.graphics.newImage("resources/Explosion.png")
+---@param oncomplete  function
+function M.create_explosion(oncomplete)
+	local animation = anim.new(exp_ss, 32, 32, {
+		explode = {
+			frames = { {
+				linha = 1,
+				frames = table_of_n(6),
+			} },
+			frameDuration = 100 / 1000,
+		},
+	}, nil, oncomplete)
+
+	animation:setAnimation("explode")
+
+	return animation
+end
+
 local page_ss = love.graphics.newImage("resources/pageDrop.png")
 function M.create_pagedrop()
 	local animation = anim.new(page_ss, 16, 16, {
@@ -19,9 +37,9 @@ function M.create_pagedrop()
 		},
 	})
 
-  animation:setAnimation("idle")
+	animation:setAnimation("idle")
 
-  return animation
+	return animation
 end
 
 local player_ss = love.graphics.newImage("resources/player_anim.png")
@@ -55,6 +73,13 @@ function M.create_player()
 			} },
 			frameDuration = 30 / 1000,
 		},
+    cast = {
+      frames = {{
+        linha = 5,
+        frames = table_of_n(27),
+      }},
+			frameDuration = 100 / 1000,
+    },
 	})
 end
 

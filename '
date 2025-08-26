@@ -44,7 +44,7 @@ end
 ---@field enemy_shield number
 ---@field player_dictionary table<string, boolean>
 ---@field player_alphabet string
----@field animations table[] 
+---@field animations table[]
 local M = {
 	time = 0,
 	--- The actual stack of scenes.
@@ -80,7 +80,7 @@ local M = {
 	enemy_damage = 0,
 	enemy_shield = 0,
 
-  animations = {},
+	animations = {},
 }
 
 function M:create_random_page(n)
@@ -277,21 +277,21 @@ function M:consequence(v)
 
 	if consequence_type == "damage" then
 		self:damage(consequence_target, v.value)
-    local idx = #self.animations + 1
+		local idx = #self.animations + 1
 
-    local explosion = anim.create_explosion(function(animation)
-      table.remove(self.animations, idx)
-    end)
-    table.insert(self.animations, explosion)
+		local explosion = anim.create_explosion(function(animation)
+			table.remove(self.animations, idx)
+		end)
+		table.insert(self.animations, explosion)
 
-    local targetanim = self.player.anim
-    if consequence_target == "enemy" then
-      targetanim = self.enemy
-    end
+		local targetanim = self.player.anim
+		if consequence_target == "enemy" then
+			targetanim = self.enemy
+		end
 
-    local pos = View:post(targetanim)
-    assert(pos ~= nil, "Player pos was nil")
-    View:anim(explosion, pos.x, pos.y, 2)
+		local pos = View:post(targetanim)
+		assert(pos ~= nil, "Player pos was nil")
+		View:anim(explosion, pos.x, pos.y, 2)
 	elseif consequence_type == "shield" then
 		self:shield(consequence_target, v.value)
 	elseif consequence_type == "strong" then
@@ -396,10 +396,8 @@ function M:do_cast()
 		-- end
 
 		if v and not M:consequence(v) then
-      Engine.player.anim:setAnimation("cast")
 			return
 		else
-      Engine.player.anim:setAnimation("idle_right")
 			v = table.shift(cv)
 			if v ~= nil then
 				return
@@ -412,6 +410,8 @@ function M:do_cast()
 			Room.remove_from_room(self.room, self.enemy)
 		end
 
+    Engine.player.anim:setAnimation("cast")
+
 		if p == nil then
 			Engine:scene_rewind()
 		end
@@ -421,8 +421,8 @@ end
 function M:setup_cast()
 	if self.player_spell_state ~= "start" then
 		-- Pop the incomplete spell
-    -- TODO: animate it off?
-    -- Make spell uncastable maybe?
+		-- TODO: animate it off?
+		-- Make spell uncastable maybe?
 		table.pop(self.player_spell.phrases)
 		self.player_spell_state = "start"
 	end
@@ -460,18 +460,18 @@ local word_limit = 5
 function M:playable_page(page)
 	local word = page.words[1]
 
-  local nwords = 0
-  for _, v in ipairs(self.player_spell.phrases) do
-    nwords = nwords + #v.adverbs
+	local nwords = 0
+	for _, v in ipairs(self.player_spell.phrases) do
+		nwords = nwords + #v.adverbs
 
-    if v.subject then
-      nwords = nwords + 1
-    end
+		if v.subject then
+			nwords = nwords + 1
+		end
 
-    if v.verb then
-      nwords = nwords + 1
-    end
-  end
+		if v.verb then
+			nwords = nwords + 1
+		end
+	end
 
 	if nwords >= word_limit then
 		return false
@@ -598,6 +598,8 @@ function M:load()
 	end
 
 	self.player_alphabet = alphabet
+
+	self.player_anim = require("ui.anim").create_player()
 
 	love.mouse.setVisible(false)
 

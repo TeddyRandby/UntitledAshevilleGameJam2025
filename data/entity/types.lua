@@ -15,8 +15,8 @@ return {
 		position_x = nil,
 		position_y = nil,
 		collision = function(self)
-			Engine:setup_combat(self)
 			Engine:scene_push("combat")
+      Engine:setup_combat(self)
 		end,
     remove = function(self)
       local corpse = Entity.create("butter_corpse")
@@ -35,8 +35,7 @@ return {
   },
 	{
 		type = "enemy_milk",
-    -- spritename = "MilkEnemy.png",
-    spritename = "ButterEnemy.png",
+    spritename = "MilkEnemy.png",
 		speed = 5,
 		position_x = nil,
 		position_y = nil,
@@ -63,9 +62,8 @@ return {
   },
 	{
 		type = "enemy_flour",
-    -- spritename = "FlourEnemy.png",
+    spritename = "FlourEnemy.png",
 		speed = 5,
-    spritename = "ButterEnemy.png",
 		position_x = nil,
 		position_y = nil,
 		collision = function(self)
